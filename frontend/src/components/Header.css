@@ -7,6 +7,29 @@
   z-index: 1000;
 }
 
+/* 
+  Fix for backdrop-filter breaking position: fixed descendants:
+  We apply the blur to a pseudo-element so that .trailing-actions
+  is not trapped in a new stacking context and can dock to the screen bottom.
+*/
+.site-header.glass-surface {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+}
+
+.site-header.glass-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(30, 34, 41, 0.06);
+  z-index: -1;
+}
+
 .header-container {
   max-width: 1600px;
   width: 100%;
