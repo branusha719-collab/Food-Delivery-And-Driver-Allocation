@@ -7,7 +7,7 @@ const Settings = () => {
   const [editingField, setEditingField] = useState(null);
   const [tempValue, setTempValue] = useState('');
   const [notifications, setNotifications] = useState({ orders: true, promos: true, recommendations: false, sms: false });
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [language, setLanguage] = useState('en');
 
   const startEdit = (field) => {
@@ -23,6 +23,15 @@ const Settings = () => {
 
   const toggleNotification = (key) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    if (!darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   return (
@@ -89,7 +98,7 @@ const Settings = () => {
               <div className="settings-row-desc">Switch to a darker color theme</div>
             </div>
             <label className="toggle-switch">
-              <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
+              <input type="checkbox" checked={darkMode} onChange={toggleDarkMode} />
               <span className="toggle-slider"></span>
             </label>
           </div>

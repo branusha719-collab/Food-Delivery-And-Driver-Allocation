@@ -62,6 +62,38 @@
   --background: #f9f9ff;
   --on-background: #181c23;
   --surface-variant: #dfe2ec;
+}
+
+.dark {
+  --surface: #10141a;
+  --surface-dim: #10141a;
+  --surface-bright: #363941;
+  --surface-container-lowest: #0b0f14;
+  --surface-container-low: #181c23;
+  --surface-container: #1c2027;
+  --surface-container-high: #272a31;
+  --surface-container-highest: #32353c;
+  --on-surface: #e1e2e9;
+  --on-surface-variant: #d5c3be;
+  --inverse-surface: #e1e2e9;
+  --inverse-on-surface: #2d3138;
+  --outline: #9d8e8a;
+  --outline-variant: #504441;
+  --surface-tint: #ffb59f;
+  --primary: #ffb59f;
+  --on-primary: #5c1500;
+  --primary-container: #862300;
+  --on-primary-container: #ffdbd1;
+  --secondary: #ffb86b;
+  --on-secondary: #482900;
+  --secondary-container: #683d00;
+  --on-secondary-container: #ffdcbc;
+  --background: #10141a;
+  --on-background: #e1e2e9;
+  --surface-variant: #504441;
+}
+
+:root {
 
   --font-display: 'Epilogue', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;

@@ -18,6 +18,12 @@
   gap: var(--spacing-lg);
 }
 
+.brand-logo-container {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
 .brand-logo {
   font-family: var(--font-display);
   font-weight: 700;
@@ -31,6 +37,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .location-selector {
@@ -44,6 +51,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .location-selector.interactive:hover,
@@ -78,6 +86,19 @@
 .delivery-time {
   color: var(--primary);
   font-weight: 700;
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--rounded-full);
+  padding: 0 var(--spacing-md);
+  height: 48px;
+  transition: all 0.2s ease;
 }
 
 /* Header Dropdown Menus */

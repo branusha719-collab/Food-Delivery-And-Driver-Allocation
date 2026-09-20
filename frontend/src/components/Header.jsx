@@ -5,6 +5,7 @@ import {
   CaretDown, Receipt, Heart, CreditCard, AddressBook, Gear, SignOut, Plus 
 } from '@phosphor-icons/react';
 import { cn } from "@/lib/utils";
+import { VideoText } from "@/registry/magicui/video-text";
 import './Header.css';
 
 const SAVED_ADDRESSES = [
@@ -36,8 +37,10 @@ const Header = ({ cartCount }) => {
   return (
     <header className="site-header glass-surface">
       <div className="header-container">
-        <Link to="/" className="brand-logo">
-          Foodgy
+        <Link to="/" className="brand-logo-container">
+          <VideoText src="https://cdn.pixabay.com/video/2016/09/24/5521-184511516_tiny.mp4" className="w-[120px] h-[40px] rounded-md font-bold text-3xl">
+            Foodgy
+          </VideoText>
         </Link>
         
         {/* Address Dropdown */}
