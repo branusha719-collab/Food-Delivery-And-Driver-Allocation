@@ -4,14 +4,15 @@
 
 .hero-section {
   position: relative;
-  height: 400px;
+  min-height: 400px;
+  height: auto;
   border-radius: var(--rounded-xl);
   margin: var(--spacing-lg) var(--spacing-xl);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center; /* Center horizontally */
-  padding: 0 var(--spacing-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl);
   background: linear-gradient(rgba(30, 34, 41, 0.7), rgba(30, 34, 41, 0.3)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80') center/cover;
   color: white;
   text-align: center; /* Center text */
@@ -309,9 +310,10 @@
 /* Mobile Responsiveness */
 @media (max-width: 1024px) {
   .hero-section {
-    height: 320px;
+    min-height: 320px;
+    height: auto;
     margin: var(--spacing-sm);
-    padding: var(--spacing-md);
+    padding: var(--spacing-xl) var(--spacing-md);
   }
 
   .hero-content h1 {

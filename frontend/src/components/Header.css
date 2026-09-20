@@ -127,6 +127,30 @@
   transition: all 0.2s ease;
 }
 
+.search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0;
+  color: var(--on-surface);
+}
+
+.shortcut-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background-color: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
 /* Trailing Actions (Right Side Icons) */
 .trailing-actions {
   display: flex;
@@ -510,3 +534,5 @@
     min-width: unset;
   }
 }
+ 
+ 
