@@ -307,7 +307,7 @@
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .hero-section {
     height: 320px;
     margin: var(--spacing-sm);

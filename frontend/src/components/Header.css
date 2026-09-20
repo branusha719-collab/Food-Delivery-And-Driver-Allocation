@@ -343,8 +343,8 @@
   display: none;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 1024px) {
   .mobile-only {
     display: flex;
   }

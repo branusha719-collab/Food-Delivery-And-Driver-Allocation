@@ -897,7 +897,7 @@
 }
 
 /* ===== Mobile Responsiveness ===== */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .profile-page {
     padding: var(--spacing-lg) var(--spacing-md);
   }
