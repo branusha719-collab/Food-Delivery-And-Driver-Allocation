@@ -11,6 +11,8 @@ import Favorites from './pages/Favorites'
 import Payments from './pages/Payments'
 import Addresses from './pages/Addresses'
 import Settings from './pages/Settings'
+import DriverDashboard from './pages/DriverDashboard'
+import DriverLogin from './pages/DriverLogin'
 
 function App() {
   const [cart, setCart] = useState([])
@@ -37,6 +39,8 @@ function App() {
           <Route path="/profile/payments" element={<Payments />} />
           <Route path="/profile/addresses" element={<Addresses />} />
           <Route path="/profile/settings" element={<Settings />} />
+          <Route path="/driver/login" element={<DriverLogin />} />
+          <Route path="/driver/dashboard" element={<DriverDashboard />} />
         </Routes>
       </main>
     </div>
