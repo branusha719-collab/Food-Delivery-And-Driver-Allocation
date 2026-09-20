@@ -12,3 +12,10 @@
   margin: 0 auto;
   width: 100%;
 }
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 130px; /* Account for wrapped header on mobile */
+    padding-bottom: 70px; /* Account for bottom nav */
+  }
+}

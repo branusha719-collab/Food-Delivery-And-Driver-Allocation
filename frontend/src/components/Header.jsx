@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   MagnifyingGlass, ShoppingCart, MapPin, User, Bell, 
-  CaretDown, Receipt, Heart, CreditCard, AddressBook, Gear, SignOut, Plus 
+  CaretDown, Receipt, Heart, CreditCard, AddressBook, Gear, SignOut, Plus, House 
 } from '@phosphor-icons/react';
 import { cn } from "@/lib/utils";
 import './Header.css';
@@ -89,7 +89,17 @@ const Header = ({ cartCount }) => {
         </div>
         
         <div className="trailing-actions">
-          <button className="action-btn icon-btn"><Bell size={24} /></button>
+          {/* Mobile Home Button */}
+          <Link to="/" className="action-btn icon-btn mobile-only">
+            <House size={24} />
+            <span className="cart-text">Home</span>
+          </Link>
+          
+          <button className="action-btn icon-btn">
+            <Bell size={24} />
+            <span className="cart-text mobile-only">Alerts</span>
+          </button>
+          
           <button className="action-btn cart-btn">
             <ShoppingCart size={24} />
             <span className="cart-text">Cart ({cartCount})</span>
@@ -102,6 +112,7 @@ const Header = ({ cartCount }) => {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
             >
               <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Profile" className="avatar-img" />
+              <span className="cart-text mobile-only">Profile</span>
             </button>
 
             {isProfileOpen && (
