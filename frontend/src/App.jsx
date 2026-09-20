@@ -6,6 +6,11 @@ import Home from './pages/Home'
 import Restaurant from './pages/Restaurant'
 import Checkout from './pages/Checkout'
 import OrderTracker from './pages/OrderTracker'
+import Orders from './pages/Orders'
+import Favorites from './pages/Favorites'
+import Payments from './pages/Payments'
+import Addresses from './pages/Addresses'
+import Settings from './pages/Settings'
 
 function App() {
   const [cart, setCart] = useState([])
@@ -25,6 +30,13 @@ function App() {
           <Route path="/restaurant/:id" element={<Restaurant cart={cart} addToCart={addToCart} clearCart={clearCart} />} />
           <Route path="/order/checkout" element={<Checkout cart={cart} clearCart={clearCart} />} />
           <Route path="/order/:id" element={<OrderTracker />} />
+          
+          {/* Profile Routes */}
+          <Route path="/profile/orders" element={<Orders />} />
+          <Route path="/profile/favorites" element={<Favorites />} />
+          <Route path="/profile/payments" element={<Payments />} />
+          <Route path="/profile/addresses" element={<Addresses />} />
+          <Route path="/profile/settings" element={<Settings />} />
         </Routes>
       </main>
     </div>

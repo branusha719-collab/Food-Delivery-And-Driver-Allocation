@@ -116,23 +116,23 @@ const Header = ({ cartCount }) => {
                   </div>
                 </div>
                 <div className="dropdown-divider"></div>
-                <button className="header-dropdown-item">
+                <Link to="/profile/orders" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
                   <Receipt size={18} className="item-icon" /> Orders
-                </button>
-                <button className="header-dropdown-item">
+                </Link>
+                <Link to="/profile/favorites" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
                   <Heart size={18} className="item-icon" /> Favorites
-                </button>
-                <button className="header-dropdown-item">
+                </Link>
+                <Link to="/profile/payments" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
                   <CreditCard size={18} className="item-icon" /> Payments
-                </button>
-                <button className="header-dropdown-item">
+                </Link>
+                <Link to="/profile/addresses" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
                   <AddressBook size={18} className="item-icon" /> Addresses
-                </button>
+                </Link>
                 <div className="dropdown-divider"></div>
-                <button className="header-dropdown-item">
+                <Link to="/profile/settings" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
                   <Gear size={18} className="item-icon" /> Settings
-                </button>
-                <button className="header-dropdown-item text-error">
+                </Link>
+                <button className="header-dropdown-item text-error" onClick={() => setIsProfileOpen(false)}>
                   <SignOut size={18} className="item-icon" /> Log Out
                 </button>
               </div>
