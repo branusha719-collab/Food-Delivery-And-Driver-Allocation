@@ -1,0 +1,236 @@
+.restaurant-page {
+  padding-bottom: 120px; /* Space for floating cart */
+}
+
+.restaurant-hero {
+  position: relative;
+  height: 450px;
+  width: 100%;
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.restaurant-info-card {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 800px;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-radius: var(--rounded-xl);
+  text-align: center;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.info-header h1 {
+  font-size: 36px;
+}
+
+.rating-badge.large {
+  font-size: 16px;
+  padding: 4px 10px;
+}
+
+.cuisine-tags {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  margin-bottom: var(--spacing-md);
+}
+
+.info-meta {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.info-meta span {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.menu-section {
+  max-width: 1400px;
+  margin: 100px auto 0;
+  padding: 0 var(--spacing-xl);
+}
+
+.menu-categories {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  justify-content: center;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.menu-item-card {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  transition: box-shadow 0.2s;
+}
+
+.menu-item-card:hover {
+  box-shadow: 0 16px 36px -8px rgba(30, 34, 41, 0.08);
+}
+
+.menu-item-content {
+  flex: 1;
+  padding-right: var(--spacing-md);
+}
+
+.dietary-badge {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--outline);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.dietary-badge[data-type="Veg"] {
+  border-color: var(--tertiary);
+}
+
+.dietary-badge[data-type="Veg"] .inner-dot {
+  background-color: var(--tertiary);
+}
+
+.dietary-badge[data-type="Non-Veg"] {
+  border-color: #8D5B4C; /* Brown */
+}
+
+.dietary-badge[data-type="Non-Veg"] .inner-dot {
+  background-color: #8D5B4C;
+}
+
+.inner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.menu-item-content h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.item-price {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--on-surface);
+  margin-bottom: var(--spacing-sm);
+}
+
+.item-desc {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  line-height: 1.4;
+}
+
+.menu-item-image {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.menu-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--rounded-md);
+}
+
+.add-btn {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  color: var(--primary-container);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 6px 20px;
+  border-radius: var(--rounded-full);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(30,34,41, 0.1);
+  transition: all 0.2s;
+}
+
+.add-btn:hover {
+  background-color: var(--surface-container-low);
+  color: var(--primary);
+}
+
+.add-btn:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.floating-cart {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  max-width: 400px;
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--rounded-full);
+  z-index: 1000;
+  box-shadow: 0 16px 36px -8px rgba(30, 34, 41, 0.15);
+}
+
+.cart-summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-items {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+
+.cart-total {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.checkout-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 12px 24px;
+  border-radius: var(--rounded-full);
+}
