@@ -14,28 +14,58 @@ const CATEGORIES = [
   'Authentic Asian', 'Vegan & Organics'
 ];
 
-const SORT_OPTIONS = [
-  { id: 'curated', label: 'Curated for You' },
-  { id: 'delivery', label: 'Delivery Time' },
-  { id: 'rating', label: 'Top Rated' },
-  { id: 'price_low', label: 'Price: Low to High' },
-  { id: 'price_high', label: 'Price: High to Low' },
+const FILTERS = [
+  { id: 'top_rated', label: 'Top Rated 4.5+' },
+  { id: 'fast_delivery', label: 'Under 30 Mins' },
+  { id: 'veg', label: 'Pure Veg & Vegan' },
+  { id: 'free_delivery', label: 'Free Delivery' }
 ];
 
 const Home = () => {
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState(SORT_OPTIONS[0]);
-  const dropdownRef = useRef(null);
+  const [activeCategory, setActiveCategory] = useState('All Cuisines');
+  const [activeFilters, setActiveFilters] = useState([]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsSortOpen(false);
+  const toggleFilter = (filterId) => {
+    setActiveFilters(prev => 
+      prev.includes(filterId) 
+        ? prev.filter(f => f !== filterId)
+        : [...prev, filterId]
+    );
+  };
+
+  const filteredRestaurants = RESTAURANTS.filter(restaurant => {
+    // Category filter
+    if (activeCategory !== 'All Cuisines') {
+      // Very basic mock matching since categories in mockData are strings like "Seafood • Comfort Food"
+      // If we had strict tags, we'd do a better check. For now, just a substring check if possible
+      // Or we just don't heavily filter category for mock if it doesn't match perfectly, 
+      // but let's do a basic includes
+      const catMatch = CATEGORIES.some(c => restaurant.categories.includes(c.split(' ')[0])); 
+      // not perfectly matched with mock data, so we might just skip category strict filtering for this demo
+      // or we just filter by the activeCategory substring
+      if (!restaurant.categories.toLowerCase().includes(activeCategory.split(' ')[0].toLowerCase())) {
+         return false;
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    }
+
+    // Filters
+    if (activeFilters.includes('top_rated')) {
+      if (parseFloat(restaurant.rating) < 4.5) return false;
+    }
+    if (activeFilters.includes('fast_delivery')) {
+      // Delivery time looks like "16-31 min". We can check the second number.
+      const maxTime = parseInt(restaurant.deliveryTime.split('-')[1]);
+      if (maxTime > 30) return false;
+    }
+    if (activeFilters.includes('veg')) {
+      if (!restaurant.categories.toLowerCase().includes('veg')) return false;
+    }
+    if (activeFilters.includes('free_delivery')) {
+      if (restaurant.badge !== 'Free Delivery') return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="home-page">
@@ -56,55 +86,42 @@ const Home = () => {
 
       <section className="categories-section">
         <div className="categories-scroll">
-          <button className="category-pill active">All Cuisines</button>
+          <button 
+            className={cn("category-pill", activeCategory === 'All Cuisines' && "active")}
+            onClick={() => setActiveCategory('All Cuisines')}
+          >
+            All Cuisines
+          </button>
           {CATEGORIES.map(cat => (
-            <button key={cat} className="category-pill">{cat}</button>
+            <button 
+              key={cat} 
+              className={cn("category-pill", activeCategory === cat && "active")}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
           ))}
         </div>
       </section>
 
       <section className="filters-section">
         <div className="filter-pills">
-          <button className="filter-pill">Top Rated 4.5+</button>
-          <button className="filter-pill">Under 30 Mins</button>
-          <button className="filter-pill">Pure Veg</button>
-          <button className="filter-pill">Michelin Recommended</button>
-          <button className="filter-pill">Free Delivery</button>
-          <button className="filter-pill">Price: $$ - $$$</button>
-        </div>
-        <div className="custom-dropdown" ref={dropdownRef}>
-          <button 
-            className="custom-dropdown-trigger" 
-            onClick={() => setIsSortOpen(!isSortOpen)}
-          >
-            {selectedSort.label} <CaretDown size={14} weight="bold" />
-          </button>
-          
-          {isSortOpen && (
-            <div className="custom-dropdown-menu">
-              {SORT_OPTIONS.map(option => (
-                option.id !== selectedSort.id && (
-                  <button
-                    key={option.id}
-                    className="custom-dropdown-item"
-                    onClick={() => {
-                      setSelectedSort(option);
-                      setIsSortOpen(false);
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                )
-              ))}
-            </div>
-          )}
+          {FILTERS.map(filter => (
+            <button 
+              key={filter.id} 
+              className={cn("filter-pill", activeFilters.includes(filter.id) && "active-filter")}
+              onClick={() => toggleFilter(filter.id)}
+            >
+              {filter.label}
+            </button>
+          ))}
         </div>
       </section>
 
       <section className="restaurants-section">
         <h2 className="section-title">Premier Restaurants</h2>
         <div className="restaurant-grid">
-          {RESTAURANTS.map(restaurant => (
+          {filteredRestaurants.length > 0 ? filteredRestaurants.map(restaurant => (
             <Link to={`/restaurant/${restaurant.id}`} key={restaurant.id} className="restaurant-card card-level-1">
               <div className="card-image-wrapper">
                 <img 
@@ -134,7 +151,11 @@ const Home = () => {
                 </div>
               </div>
             </Link>
-          ))}
+          )) : (
+            <div className="col-span-full py-12 text-center text-neutral-500">
+              No restaurants found matching your filters.
+            </div>
+          )}
         </div>
       </section>
     </div>

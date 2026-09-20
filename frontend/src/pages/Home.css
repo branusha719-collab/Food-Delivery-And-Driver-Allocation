@@ -131,6 +131,12 @@
   color: var(--on-surface);
 }
 
+.filter-pill.active-filter {
+  background-color: var(--on-surface);
+  color: var(--surface-container-lowest);
+  border-color: var(--on-surface);
+}
+
 .custom-dropdown {
   position: relative;
   display: inline-block;
