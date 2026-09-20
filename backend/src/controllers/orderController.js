@@ -1,6 +1,6 @@
 const orderService = require('../services/orderService');
+const driverAllocationService = require('../services/driverAllocationService');
 const { sendSuccess } = require('../utils/apiResponse');
-
 /**
  * Controller handling Order HTTP requests
  * Remains thin, delegating business logic to orderService
@@ -65,14 +65,45 @@ class OrderController {
    * PATCH /api/orders/:id/assign-driver
    */
   async assignDriver(req, res, next) {
-    try {
-      const { driverId } = req.body;
-      const order = await orderService.assignDriver(req.params.id, driverId);
-      return sendSuccess(res, 200, 'Driver assigned successfully', order);
-    } catch (error) {
-      next(error);
+  try {
+    const {
+      driverId,
+      requiredVehicleType
+    } = req.body;
+
+    // AUTO mode invokes Role 5 driver allocation.
+    if (driverId === 'AUTO') {
+      const result =
+        await driverAllocationService.allocateDriver(
+          req.params.id,
+          requiredVehicleType || null
+        );
+
+      return sendSuccess(
+        res,
+        200,
+        `Driver automatically allocated: ${result.selectedDriver.name}`,
+        result
+      );
     }
+
+    // Existing manual assignment behaviour.
+    const order =
+      await orderService.assignDriver(
+        req.params.id,
+        driverId
+      );
+
+    return sendSuccess(
+      res,
+      200,
+      'Driver assigned successfully',
+      order
+    );
+  } catch (error) {
+    next(error);
   }
+}
 
   /**
    * GET /api/restaurants/:restaurantId/orders
