@@ -98,17 +98,17 @@ const Header = ({ cartCount }) => {
           {/* Profile Dropdown */}
           <div className="header-dropdown-container" ref={profileRef}>
             <button 
-              className="action-btn user-profile interactive"
+              className="action-btn user-profile interactive profile-btn"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
             >
-              <User size={24} weight="fill" />
+              <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Profile" className="avatar-img" />
             </button>
 
             {isProfileOpen && (
               <div className="header-dropdown-menu profile-menu">
                 <div className="profile-header">
-                  <div className="profile-avatar">
-                    <User size={24} weight="fill" />
+                  <div className="profile-avatar image-avatar">
+                    <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Profile" />
                   </div>
                   <div className="profile-info">
                     <span className="profile-name">John Doe</span>
