@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
+
 const orderController = require('../controllers/orderController');
+
+const authenticate = require('../middleware/authenticate');
+const authorize = require('../middleware/authorize');
 const validateRequest = require('../middleware/requestValidator');
+
 const {
   createOrderValidator,
   updateStatusValidator,
@@ -10,19 +15,57 @@ const {
   listOrdersQueryValidator
 } = require('../validators/orderValidator');
 
-// POST /api/orders - Create new order
-router.post('/', createOrderValidator, validateRequest, orderController.createOrder);
+// POST /api/orders
+// Only authenticated customers can create orders
+router.post(
+  '/',
+  authenticate,
+  authorize('customer'),
+  createOrderValidator,
+  validateRequest,
+  orderController.createOrder
+);
 
-// GET /api/orders - List orders with pagination, filtering & sorting
-router.get('/', listOrdersQueryValidator, validateRequest, orderController.listOrders);
+// GET /api/orders
+// Authentication required
+router.get(
+  '/',
+  authenticate,
+  listOrdersQueryValidator,
+  validateRequest,
+  orderController.listOrders
+);
 
-// GET /api/orders/:id - Get order details
-router.get('/:id', orderIdParamValidator, validateRequest, orderController.getOrderById);
+// GET /api/orders/:id
+// Authentication required
+router.get(
+  '/:id',
+  authenticate,
+  orderIdParamValidator,
+  validateRequest,
+  orderController.getOrderById
+);
 
-// PATCH /api/orders/:id/status - Transition order status
-router.patch('/:id/status', updateStatusValidator, validateRequest, orderController.updateOrderStatus);
+// PATCH /api/orders/:id/status
+// Drivers and admins can update order status
+router.patch(
+  '/:id/status',
+  authenticate,
+  authorize('driver', 'admin'),
+  updateStatusValidator,
+  validateRequest,
+  orderController.updateOrderStatus
+);
 
-// PATCH /api/orders/:id/assign-driver - Assign driver to ready order (Role 5 integration)
-router.patch('/:id/assign-driver', assignDriverValidator, validateRequest, orderController.assignDriver);
+// PATCH /api/orders/:id/assign-driver
+// Only admins can assign drivers
+router.patch(
+  '/:id/assign-driver',
+  authenticate,
+  authorize('admin'),
+  assignDriverValidator,
+  validateRequest,
+  orderController.assignDriver
+);
 
 module.exports = router;

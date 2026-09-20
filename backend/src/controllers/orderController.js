@@ -11,13 +11,14 @@ class OrderController {
    */
   async createOrder(req, res, next) {
     try {
-      const { customerId, restaurantId, deliveryAddress, items } = req.body;
-      const order = await orderService.createOrder({
-        customerId,
-        restaurantId,
-        deliveryAddress,
-        items
-      });
+      const { restaurantId, deliveryAddress, items } = req.body;
+
+const order = await orderService.createOrder({
+  customerId: req.user.id,
+  restaurantId,
+  deliveryAddress,
+  items
+});
       return sendSuccess(res, 201, 'Order created successfully', order);
     } catch (error) {
       next(error);
@@ -29,7 +30,7 @@ class OrderController {
    */
   async getOrderById(req, res, next) {
     try {
-      const order = await orderService.getOrderById(req.params.id);
+      const order = await orderService.getOrderById(req.params.id, req.user);
       return sendSuccess(res, 200, 'Order retrieved successfully', order);
     } catch (error) {
       next(error);
@@ -39,14 +40,31 @@ class OrderController {
   /**
    * GET /api/orders
    */
-  async listOrders(req, res, next) {
-    try {
-      const result = await orderService.listOrders(req.query);
-      return sendSuccess(res, 200, 'Orders retrieved successfully', result);
-    } catch (error) {
-      next(error);
+  /**
+ * GET /api/orders
+ */
+async listOrders(req, res, next) {
+  try {
+    const query = { ...req.query };
+
+    // Customers can only see their own orders.
+    // Ignore any customerId supplied by the client.
+    if (req.user.role === 'customer') {
+      query.customerId = req.user.id;
     }
+
+    const result = await orderService.listOrders(query);
+
+    return sendSuccess(
+      res,
+      200,
+      'Orders retrieved successfully',
+      result
+    );
+  } catch (error) {
+    next(error);
   }
+}
 
   /**
    * PATCH /api/orders/:id/status
