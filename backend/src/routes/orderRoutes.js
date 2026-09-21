@@ -58,11 +58,11 @@ router.patch(
 );
 
 // PATCH /api/orders/:id/assign-driver
-// Only admins can assign drivers
+// Only admins can assign drivers (and customer for demo)
 router.patch(
   '/:id/assign-driver',
   authenticate,
-  authorize('admin'),
+  authorize('admin', 'customer'),
   assignDriverValidator,
   validateRequest,
   orderController.assignDriver

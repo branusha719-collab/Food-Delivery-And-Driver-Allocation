@@ -8,7 +8,7 @@ import {
 } from '@phosphor-icons/react';
 import './OrderTracker.css';
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = '/api';
 
 const OrderTracker = () => {
   const { id } = useParams();
@@ -51,12 +51,15 @@ const OrderTracker = () => {
       setAssigning(true);
       setError('');
 
+      const token = localStorage.getItem('token');
+      
       const response = await fetch(
         `${API_BASE_URL}/orders/${id}/assign-driver`,
         {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
           },
           body: JSON.stringify({
             driverId: 'AUTO'

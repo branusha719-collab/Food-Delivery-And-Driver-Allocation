@@ -5,6 +5,8 @@ import {
   CaretDown, Receipt, Heart, CreditCard, AddressBook, Gear, SignOut, Plus, House 
 } from '@phosphor-icons/react';
 import { cn } from "@/lib/utils";
+import { useAuth } from '../context/AuthContext';
+import AuthModal from './AuthModal';
 import './Header.css';
 
 const SAVED_ADDRESSES = [
@@ -13,8 +15,10 @@ const SAVED_ADDRESSES = [
 ];
 
 const Header = ({ cartCount }) => {
+  const { user, logout } = useAuth();
   const [isAddressOpen, setIsAddressOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(SAVED_ADDRESSES[0]);
   
   const addressRef = useRef(null);
@@ -105,52 +109,66 @@ const Header = ({ cartCount }) => {
             <span className="cart-text">Cart ({cartCount})</span>
           </button>
           
-          {/* Profile Dropdown */}
-          <div className="header-dropdown-container" ref={profileRef}>
+          {/* Profile Dropdown or Sign In */}
+          {!user ? (
             <button 
-              className="action-btn user-profile interactive profile-btn"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="btn-primary" 
+              style={{ padding: '8px 16px', borderRadius: 'var(--rounded-full)', fontSize: '14px' }}
+              onClick={() => setIsAuthModalOpen(true)}
             >
-              <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Profile" className="avatar-img" />
-              <span className="cart-text mobile-only">Profile</span>
+              Sign In
             </button>
+          ) : (
+            <div className="header-dropdown-container" ref={profileRef}>
+              <button 
+                className="action-btn user-profile interactive profile-btn"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+              >
+                <img src={`https://i.pravatar.cc/150?u=${user.id || 'default'}`} alt="Profile" className="avatar-img" />
+                <span className="cart-text mobile-only">Profile</span>
+              </button>
 
-            {isProfileOpen && (
-              <div className="header-dropdown-menu profile-menu">
-                <div className="profile-header">
-                  <div className="profile-avatar image-avatar">
-                    <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Profile" />
+              {isProfileOpen && (
+                <div className="header-dropdown-menu profile-menu">
+                  <div className="profile-header">
+                    <div className="profile-avatar image-avatar">
+                      <img src={`https://i.pravatar.cc/150?u=${user.id || 'default'}`} alt="Profile" />
+                    </div>
+                    <div className="profile-info">
+                      <span className="profile-name">{user.name}</span>
+                      <span className="profile-phone">{user.email}</span>
+                    </div>
                   </div>
-                  <div className="profile-info">
-                    <span className="profile-name">John Doe</span>
-                    <span className="profile-phone">+1 (555) 123-4567</span>
-                  </div>
+                  <div className="dropdown-divider"></div>
+                  <Link to="/profile/orders" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
+                    <Receipt size={18} className="item-icon" /> Orders
+                  </Link>
+                  <Link to="/profile/favorites" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
+                    <Heart size={18} className="item-icon" /> Favorites
+                  </Link>
+                  <Link to="/profile/payments" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
+                    <CreditCard size={18} className="item-icon" /> Payments
+                  </Link>
+                  <Link to="/profile/addresses" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
+                    <AddressBook size={18} className="item-icon" /> Addresses
+                  </Link>
+                  <div className="dropdown-divider"></div>
+                  <Link to="/profile/settings" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
+                    <Gear size={18} className="item-icon" /> Settings
+                  </Link>
+                  <button className="header-dropdown-item text-error" onClick={() => { 
+                    setIsProfileOpen(false); 
+                    logout(); 
+                  }}>
+                    <SignOut size={18} className="item-icon" /> Log Out
+                  </button>
                 </div>
-                <div className="dropdown-divider"></div>
-                <Link to="/profile/orders" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
-                  <Receipt size={18} className="item-icon" /> Orders
-                </Link>
-                <Link to="/profile/favorites" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
-                  <Heart size={18} className="item-icon" /> Favorites
-                </Link>
-                <Link to="/profile/payments" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
-                  <CreditCard size={18} className="item-icon" /> Payments
-                </Link>
-                <Link to="/profile/addresses" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
-                  <AddressBook size={18} className="item-icon" /> Addresses
-                </Link>
-                <div className="dropdown-divider"></div>
-                <Link to="/profile/settings" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
-                  <Gear size={18} className="item-icon" /> Settings
-                </Link>
-                <button className="header-dropdown-item text-error" onClick={() => { setIsProfileOpen(false); window.location.href = '/'; }}>
-                  <SignOut size={18} className="item-icon" /> Log Out
-                </button>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
+      {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
     </header>
   );
 };
