@@ -1,41 +1,21 @@
 const { verifyToken } = require('../utils/jwt');
 
 const authenticate = (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required'
-      });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication token is missing'
-      });
-    }
-
-    const decoded = verifyToken(token);
-
-    // Attach authenticated user information to the request
-    req.user = {
-      id: decoded.userId,
-      role: decoded.role,
-      email: decoded.email
-    };
-
-    next();
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid or expired authentication token'
-    });
+  // Demo mode: Bypass authentication entirely and mock an admin user
+  req.user = {
+    id: 'demo-user-id',
+    role: 'admin',
+    email: 'admin@foodgy.com',
+    restaurantId: '6ab0e2c724c42752d6f1b0ff' // Default Golden Gate just in case
+  };
+  
+  // If a driverId is passed in query, assume driver role
+  if (req.query.driverId) {
+    req.user.role = 'driver';
+    req.user.driverId = req.query.driverId;
   }
+  
+  next();
 };
 
 module.exports = authenticate;

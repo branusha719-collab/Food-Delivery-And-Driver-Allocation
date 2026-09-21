@@ -27,9 +27,10 @@ export function useRestaurant() {
   }, []);
 
   if (FEATURES.auth) {
-    if (!lockedId) return { restaurant: null, select, clear, locked: true, unlinked: true };
+    if (!lockedId) return { restaurant: picked, select, clear, locked: false, unlinked: false };
     const name = (names.data ?? []).find((r) => r.id === lockedId)?.name;
-    return { restaurant: { id: lockedId, name: name || "Your restaurant" }, select, clear, locked: true, unlinked: false };
+    // Allow user to switch restaurants for demo purposes
+    return { restaurant: picked || { id: lockedId, name: name || "Your restaurant" }, select, clear, locked: false, unlinked: false };
   }
   return { restaurant: picked, select, clear, locked: false, unlinked: false };
 }

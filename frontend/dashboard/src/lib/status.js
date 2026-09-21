@@ -27,8 +27,17 @@ export const RESTAURANT_ACTIONS = {
     { label: "Accept order", to: STATUS.ACCEPTED, tone: "primary" },
     { label: "Reject", to: STATUS.REJECTED, tone: "danger", confirm: true },
   ],
-  [STATUS.ACCEPTED]: [{ label: "Start preparing", to: STATUS.PREPARING, tone: "primary" }],
-  [STATUS.PREPARING]: [{ label: "Mark ready", to: STATUS.READY, tone: "primary" }],
+  [STATUS.ACCEPTED]: [
+    { label: "Start preparing", to: STATUS.PREPARING, tone: "primary" },
+    { label: "Cancel", to: STATUS.REJECTED, tone: "danger", confirm: true }
+  ],
+  [STATUS.PREPARING]: [
+    { label: "Mark ready", to: STATUS.READY, tone: "primary" },
+    { label: "Cancel", to: STATUS.REJECTED, tone: "danger", confirm: true }
+  ],
+  [STATUS.READY]: [
+    { label: "Cancel", to: STATUS.REJECTED, tone: "danger", confirm: true }
+  ],
 };
 
 export const ALL_STATUSES = Object.values(STATUS);

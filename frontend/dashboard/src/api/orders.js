@@ -48,8 +48,9 @@ export async function listActiveRestaurantOrders(restaurantId) {
 }
 
 // PATCH /api/orders/:id/status
-export async function updateOrderStatus(id, status) {
-  return normalizeOrder(await request(`/api/orders/${id}/status`, { method: "PATCH", body: { status } }));
+export async function updateOrderStatus(id, status, reason = null) {
+  const body = reason ? { status, cancellationReason: reason } : { status };
+  return normalizeOrder(await request(`/api/orders/${id}/status`, { method: "PATCH", body }));
 }
 
 // GET /api/orders/summary  -> { totalOrders, totalAmount, byStatus: { STATUS: { count, amount } } }

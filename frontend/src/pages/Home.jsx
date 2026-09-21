@@ -33,6 +33,14 @@ const Home = () => {
   const [activeCategory, setActiveCategory] = useState('All Cuisines');
   const [activeFilters, setActiveFilters] = useState([]);
   const [restaurants, setRestaurants] = useState(MOCK_RESTAURANTS);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Listen for search from Header
+  useEffect(() => {
+    const handler = (e) => setSearchQuery(e.detail || '');
+    window.addEventListener('foodgy-search', handler);
+    return () => window.removeEventListener('foodgy-search', handler);
+  }, []);
 
   useEffect(() => {
     fetch('/api/restaurants?limit=100&active=true')
@@ -70,6 +78,15 @@ const Home = () => {
   };
 
   const filteredRestaurants = restaurants.filter(restaurant => {
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const nameMatch = restaurant.name.toLowerCase().includes(q);
+      const catMatch = restaurant.categories.toLowerCase().includes(q);
+      const featMatch = restaurant.featured?.toLowerCase().includes(q);
+      if (!nameMatch && !catMatch && !featMatch) return false;
+    }
+
     if (activeCategory !== 'All Cuisines') {
       if (!restaurant.categories.toLowerCase().includes(activeCategory.split(' ')[0].toLowerCase())) {
          return false;

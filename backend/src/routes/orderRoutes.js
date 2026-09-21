@@ -36,6 +36,14 @@ router.get(
   orderController.listOrders
 );
 
+// GET /api/orders/summary
+// Admin stats endpoint
+router.get(
+  '/summary',
+  authenticate,
+  orderController.getOrderSummary
+);
+
 // GET /api/orders/:id
 // Authentication required
 router.get(
@@ -47,11 +55,11 @@ router.get(
 );
 
 // PATCH /api/orders/:id/status
-// Drivers and admins can update order status
+// Drivers, admins, and restaurants can update order status
 router.patch(
   '/:id/status',
   authenticate,
-  authorize('driver', 'admin'),
+  authorize('driver', 'admin', 'restaurant'),
   updateStatusValidator,
   validateRequest,
   orderController.updateOrderStatus

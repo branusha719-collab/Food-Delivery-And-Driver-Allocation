@@ -69,10 +69,10 @@ function Board({ restaurant }) {
     });
   }, [restaurant.id, refresh]);
 
-  async function act(order, to) {
+  async function act(order, to, reason) {
     setPending(order.id); setMessage(null);
     try {
-      await updateOrderStatus(order.id, to);
+      await updateOrderStatus(order.id, to, reason);
       setMessage({ ok: true, text: `Order #${order.ref} is now ${STATUS_LABEL[to].toLowerCase()}.` });
     } catch (e) {
       setMessage({ ok: false, text: `Order #${order.ref} wasn't updated. ${e.message}` });

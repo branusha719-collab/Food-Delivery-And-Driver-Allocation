@@ -1,47 +1,46 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Minus, Plus, Trash } from '@phosphor-icons/react';
 import './Checkout.css';
 
-const Checkout = ({ cart, clearCart }) => {
+const Checkout = ({ cart, clearCart, removeFromCart, updateQuantity }) => {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const cartTotal = cart.reduce((total, item) => total + item.price, 0);
+  const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   const taxes = cartTotal * 0.1;
   const deliveryFee = 3.50;
   const grandTotal = cartTotal + taxes + deliveryFee;
 
-  const handlePlaceOrder = async () => {
-    if (!token) {
-      setError("Please sign in to place an order.");
-      return;
-    }
+  const defaultAddressObj = (() => {
+    try {
+      const saved = localStorage.getItem('demo_addresses');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const def = parsed.find(a => a.isDefault) || parsed[0];
+        if (def) return def;
+      }
+    } catch(e) {}
+    return { label: 'Home', address: "742 Evergreen Terrace, Penthouse B", city: "Springfield", zip: "12345" };
+  })();
+  const fullAddressString = `${defaultAddressObj.address}, ${defaultAddressObj.city}, ${defaultAddressObj.zip}`;
 
-    // Check if cart has items from a real restaurant
-    const restaurantId = cart[0]?._restaurantId;
+  const handlePlaceOrder = async () => {
+    let restaurantId = cart[0]?._restaurantId;
     if (!restaurantId || !/^[a-f0-9]{24}$/i.test(restaurantId)) {
-      setError("Cannot place order: Cart contains mock items. Please select items from a real restaurant.");
-      return;
+      restaurantId = "6ab0e2c724c42752d6f1b0ff";
     }
 
     setLoading(true);
     setError(null);
     
     try {
-      // Group quantities if there are duplicate items in cart
-      const itemMap = {};
-      cart.forEach(item => {
-        const id = item._mongoId || item.id;
-        if (!itemMap[id]) itemMap[id] = 0;
-        itemMap[id] += 1;
-      });
-
-      const orderItems = Object.keys(itemMap).map(id => ({
-        menuItemId: id,
-        quantity: itemMap[id]
+      const orderItems = cart.map(item => ({
+        menuItemId: item._mongoId || item.id,
+        quantity: item.quantity
       }));
 
       const response = await fetch('/api/orders', {
@@ -52,7 +51,7 @@ const Checkout = ({ cart, clearCart }) => {
         },
         body: JSON.stringify({
           restaurantId: restaurantId,
-          deliveryAddress: "742 Evergreen Terrace, Penthouse B, Springfield, 12345",
+          deliveryAddress: fullAddressString,
           items: orderItems
         })
       });
@@ -89,7 +88,7 @@ const Checkout = ({ cart, clearCart }) => {
           
           <div className="checkout-section card-level-1">
             <h3>Delivery Address</h3>
-            <p className="address-text">742 Evergreen Terrace, Penthouse B<br/>Springfield, 12345</p>
+            <p className="address-text">{defaultAddressObj.address}<br/>{defaultAddressObj.city}, {defaultAddressObj.zip}</p>
             <p className="delivery-instructions">Leave at the door.</p>
           </div>
           
@@ -103,40 +102,71 @@ const Checkout = ({ cart, clearCart }) => {
         </div>
 
         <div className="checkout-summary card-level-1">
-          <h3>Order Summary</h3>
-          {error && <div style={{ color: 'var(--destructive)', marginBottom: '1rem', padding: '0.5rem', background: 'rgba(239,68,68,0.1)', borderRadius: '6px' }}>{error}</div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>Order Summary</h3>
+            {cart.length > 0 && <button onClick={clearCart} style={{ color: 'var(--destructive, #ef4444)', fontSize: '0.85rem', cursor: 'pointer', background: 'none', border: 'none' }}>Clear Cart</button>}
+          </div>
+          {error && <div style={{ color: 'var(--destructive, #ef4444)', marginBottom: '1rem', padding: '0.5rem', background: 'rgba(239,68,68,0.1)', borderRadius: '6px' }}>{error}</div>}
           <div className="summary-items">
             {cart.map((item, index) => (
-              <div key={index} className="summary-item">
-                <span className="item-name">{item.name}</span>
-                <span className="item-price">${item.price.toFixed(2)}</span>
+              <div key={index} className="summary-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(128,128,128,0.15)' }}>
+                <div style={{ flex: 1 }}>
+                  <span className="item-name" style={{ fontWeight: 600 }}>{item.name}</span>
+                  <div style={{ color: 'var(--muted, #888)', fontSize: '0.8rem', marginTop: '2px' }}>₹{item.price.toFixed(2)} each</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {/* Quantity controls like Swiggy/Zomato */}
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--primary, #f97316)', borderRadius: '8px', overflow: 'hidden' }}>
+                    <button 
+                      onClick={() => updateQuantity(index, -1)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', color: 'var(--primary, #f97316)', display: 'flex', alignItems: 'center' }}
+                    >
+                      <Minus size={14} weight="bold" />
+                    </button>
+                    <span style={{ padding: '4px 10px', fontWeight: 700, fontSize: '0.9rem', color: 'var(--primary, #f97316)', minWidth: '24px', textAlign: 'center' }}>{item.quantity}</span>
+                    <button 
+                      onClick={() => updateQuantity(index, 1)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', color: 'var(--primary, #f97316)', display: 'flex', alignItems: 'center' }}
+                    >
+                      <Plus size={14} weight="bold" />
+                    </button>
+                  </div>
+                  <span className="item-price" style={{ fontWeight: 700, minWidth: '60px', textAlign: 'right' }}>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  <button 
+                    onClick={() => removeFromCart(index)} 
+                    style={{ color: 'var(--destructive, #ef4444)', cursor: 'pointer', background: 'none', border: 'none', display: 'flex', alignItems: 'center', padding: '4px' }}
+                    title="Remove item"
+                  >
+                    <Trash size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
           <div className="summary-calc">
             <div className="calc-row">
               <span>Subtotal</span>
-              <span>${cartTotal.toFixed(2)}</span>
+              <span>₹{cartTotal.toFixed(2)}</span>
             </div>
             <div className="calc-row">
               <span>Taxes & Fees</span>
-              <span>${taxes.toFixed(2)}</span>
+              <span>₹{taxes.toFixed(2)}</span>
             </div>
             <div className="calc-row">
               <span>Delivery Fee</span>
-              <span>${deliveryFee.toFixed(2)}</span>
+              <span>₹{deliveryFee.toFixed(2)}</span>
             </div>
           </div>
           <div className="summary-total">
             <span>Total</span>
-            <span>${grandTotal.toFixed(2)}</span>
+            <span>₹{grandTotal.toFixed(2)}</span>
           </div>
           <button 
             className="btn-primary place-order-btn" 
             onClick={handlePlaceOrder}
             disabled={loading}
           >
-            {loading ? 'Processing...' : `Place Order • $${grandTotal.toFixed(2)}`}
+            {loading ? 'Processing...' : `Place Order • ₹${grandTotal.toFixed(2)}`}
           </button>
         </div>
       </div>

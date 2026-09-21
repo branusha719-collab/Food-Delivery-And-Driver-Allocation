@@ -19,3 +19,40 @@
     padding-bottom: 70px; /* Account for bottom nav */
   }
 }
+
+/* In-app modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+
+.modal-box {
+  background: var(--surface, #fff);
+  border-radius: 16px;
+  padding: 1.75rem;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: slideUp 0.2s ease;
+}
+
+.modal-box h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

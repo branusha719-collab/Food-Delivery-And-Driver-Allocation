@@ -8,7 +8,16 @@ const MOCK_ADDRESSES = [
 ];
 
 const Addresses = () => {
-  const [addresses, setAddresses] = useState(MOCK_ADDRESSES);
+  const [addresses, setAddresses] = useState(() => {
+    const saved = localStorage.getItem('demo_addresses');
+    if (saved) return JSON.parse(saved);
+    return MOCK_ADDRESSES;
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('demo_addresses', JSON.stringify(addresses));
+  }, [addresses]);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ type: 'home', label: '', address: '', city: '', zip: '' });

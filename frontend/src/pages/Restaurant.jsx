@@ -70,7 +70,15 @@ const Restaurant = ({ cart, addToCart, clearCart }) => {
     }
   }, [id]);
 
-  const cartTotal = cart.reduce((total, item) => total + item.price, 0);
+  // Helper: get quantity of a specific item in the cart
+  const getCartQuantity = (item) => {
+    const itemId = item._mongoId || item.id;
+    const found = cart.find(ci => (ci._mongoId || ci.id) === itemId);
+    return found ? found.quantity : 0;
+  };
+
+  const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleAddToCart = (item) => {
     // Attach the real restaurant ID for API order creation
@@ -117,36 +125,51 @@ const Restaurant = ({ cart, addToCart, clearCart }) => {
         </div>
 
         <div className="menu-grid">
-          {menu.map(item => (
-            <div key={item.id} className="menu-item-card card-level-1">
-              <div className="menu-item-content">
-                <div className="dietary-badge" data-type={item.dietary}>
-                  <div className="inner-dot"></div>
+          {menu.map(item => {
+            const qty = getCartQuantity(item);
+            return (
+              <div key={item.id} className="menu-item-card card-level-1">
+                <div className="menu-item-content">
+                  <div className="dietary-badge" data-type={item.dietary}>
+                    <div className="inner-dot"></div>
+                  </div>
+                  <h3>{item.name}</h3>
+                  <p className="item-price">₹{item.price.toFixed(2)}</p>
+                  <p className="item-desc">{item.description}</p>
                 </div>
-                <h3>{item.name}</h3>
-                <p className="item-price">${item.price.toFixed(2)}</p>
-                <p className="item-desc">{item.description}</p>
+                <div className="menu-item-image">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"; e.target.onerror = null; }}
+                  />
+                  {qty === 0 ? (
+                    <button className="add-btn" onClick={() => handleAddToCart(item)}>
+                      <Plus size={16} weight="bold" /> ADD
+                    </button>
+                  ) : (
+                    <div className="qty-control-btn">
+                      <button onClick={() => handleAddToCart({ ...item, _delta: -1 })} className="qty-minus">
+                        <Minus size={14} weight="bold" />
+                      </button>
+                      <span className="qty-value">{qty}</span>
+                      <button onClick={() => handleAddToCart(item)} className="qty-plus">
+                        <Plus size={14} weight="bold" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="menu-item-image">
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"; e.target.onerror = null; }}
-                />
-                <button className="add-btn" onClick={() => handleAddToCart(item)}>
-                  <Plus size={16} weight="bold" /> ADD
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {cart.length > 0 && (
+      {cartItemCount > 0 && (
         <div className="floating-cart glass-surface">
           <div className="cart-summary">
-            <span className="cart-items">{cart.length} item{cart.length > 1 ? 's' : ''}</span>
-            <span className="cart-total">${cartTotal.toFixed(2)}</span>
+            <span className="cart-items">{cartItemCount} item{cartItemCount > 1 ? 's' : ''}</span>
+            <span className="cart-total">₹{cartTotal.toFixed(2)}</span>
           </div>
           <Link to="/order/checkout" className="btn-primary checkout-btn">
             Checkout <ArrowRight size={16} weight="bold" />

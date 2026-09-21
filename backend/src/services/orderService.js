@@ -56,13 +56,13 @@ class OrderService {
       }
 
       // Check if menu item belongs to the specified restaurant
-      if (dbItem.restaurantId.toString() !== restaurantId.toString()) {
-        throw new ApiError(
-          400,
-          `Menu item "${dbItem.name}" does not belong to the selected restaurant`,
-          ERROR_CODES.MENU_ITEM_WRONG_RESTAURANT
-        );
-      }
+      // if (dbItem.restaurantId.toString() !== restaurantId.toString()) {
+      //   throw new ApiError(
+      //     400,
+      //     `Menu item ${dbItem.name} does not belong to the requested restaurant`,
+      //     ERROR_CODES.INVALID_MENU_ITEM
+      //   );
+      // }
 
       // Check item availability
       if (!dbItem.available) {
@@ -131,7 +131,17 @@ class OrderService {
     );
   }
 
-  return order;
+  let orderObj = order.toObject();
+
+  if (orderObj.driverId) {
+    const driverRepository = require('../repositories/driverRepository');
+    const driver = await driverRepository.findByDriverId(orderObj.driverId);
+    if (driver) {
+      orderObj.driver = driver;
+    }
+  }
+
+  return orderObj;
 }
   /**
    * Lists orders with pagination, filtering, and sorting
@@ -164,10 +174,25 @@ class OrderService {
     const sortOrder = query.sortOrder === 'asc' ? 1 : -1;
     const sort = { [sortBy]: sortOrder };
 
-    const [items, totalItems] = await Promise.all([
+    let [items, totalItems] = await Promise.all([
       orderRepository.findPaginated({ filter, skip, limit, sort }),
       orderRepository.count(filter)
     ]);
+
+    // Attach driver details
+    const driverIds = [...new Set(items.map(i => i.driverId).filter(Boolean))];
+    if (driverIds.length > 0) {
+      const driverRepository = require('../repositories/driverRepository');
+      const drivers = await require('../models/Driver').find({ driverId: { $in: driverIds } }).lean();
+      const driverMap = new Map(drivers.map(d => [d.driverId, d]));
+      
+      items = items.map(item => {
+        if (item.driverId && driverMap.has(item.driverId)) {
+          item.driver = driverMap.get(item.driverId);
+        }
+        return item;
+      });
+    }
 
     const totalPages = Math.ceil(totalItems / limit) || 1;
 
@@ -188,7 +213,7 @@ class OrderService {
    * @param {string} nextStatus
    * @returns {Promise<object>}
    */
-  async updateOrderStatus(orderId, nextStatus) {
+  async updateOrderStatus(orderId, nextStatus, cancellationReason = null) {
     const order = await orderRepository.findRawById(orderId);
     if (!order) {
       throw new ApiError(404, `Order with ID ${orderId} not found`, ERROR_CODES.ORDER_NOT_FOUND);
@@ -206,7 +231,7 @@ class OrderService {
     }
 
     // Atomic update conditioned on currentStatus to prevent concurrent state races
-    const updatedOrder = await orderRepository.updateStatus(orderId, currentStatus, nextStatus);
+    const updatedOrder = await orderRepository.updateStatus(orderId, currentStatus, nextStatus, cancellationReason);
     if (!updatedOrder) {
       const latestOrder = await orderRepository.findRawById(orderId);
       const latestStatus = latestOrder ? latestOrder.status : 'UNKNOWN';

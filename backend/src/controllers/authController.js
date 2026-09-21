@@ -90,7 +90,9 @@ class AuthController {
             id: user._id,
             name: user.name,
             email: user.email,
-            role: user.role
+            role: user.role,
+            ...(user.restaurantId && { restaurantId: user.restaurantId }),
+            ...(user.driverId && { driverId: user.driverId }) // Might as well add driverId if it exists
           },
           token
         }

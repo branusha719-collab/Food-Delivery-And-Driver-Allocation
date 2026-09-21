@@ -68,13 +68,18 @@ class OrderRepository {
    * @param {string} nextStatus
    * @returns {Promise<Order|null>}
    */
-  async updateStatus(orderId, expectedCurrentStatus, nextStatus) {
+  async updateStatus(orderId, expectedCurrentStatus, nextStatus, cancellationReason = null) {
+    const updatePayload = { status: nextStatus };
+    if (cancellationReason) {
+      updatePayload.cancellationReason = cancellationReason;
+    }
+    
     return await Order.findOneAndUpdate(
       {
         _id: orderId,
         status: expectedCurrentStatus
       },
-      { status: nextStatus },
+      updatePayload,
       { new: true, runValidators: true }
     ).populate('restaurantId', 'name address');
   }

@@ -2,4 +2,8 @@
 export const normalizeUser = (u) => (u ? { ...u, role: String(u.role || "").toLowerCase(), restaurantId: u.restaurantId || null } : null);
 
 // Where each role lands after signing in.
-export const homeFor = (user) => (user?.role === "admin" ? "/admin" : "/restaurant");
+export const homeFor = (user) => {
+  if (user?.role === "admin") return "/admin";
+  if (user?.role === "driver") return "/driver";
+  return "/restaurant";
+};

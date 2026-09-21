@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const USER_ROLES = ['customer', 'driver', 'admin'];
+const USER_ROLES = ['customer', 'driver', 'admin', 'restaurant'];
 
 const UserSchema = new mongoose.Schema(
   {
@@ -37,6 +37,20 @@ const UserSchema = new mongoose.Schema(
       default: 'customer',
       required: true,
       index: true
+    },
+    
+    restaurantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Restaurant',
+      default: null,
+      index: true
+    },
+    
+    driverId: {
+      type: String,
+      default: null,
+      index: true,
+      trim: true
     }
   },
   {

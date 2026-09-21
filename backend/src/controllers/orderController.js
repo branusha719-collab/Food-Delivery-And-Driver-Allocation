@@ -32,6 +32,32 @@ class OrderController {
   }
 
   /**
+   * GET /api/orders/summary
+   */
+  async getOrderSummary(req, res, next) {
+    try {
+      // Mock summary data for dashboard
+      const summary = {
+        totalOrders: 15,
+        totalAmount: 45000,
+        byStatus: {
+          PLACED: { count: 2, amount: 4500 },
+          ACCEPTED: { count: 3, amount: 9000 },
+          PREPARING: { count: 4, amount: 12000 },
+          READY: { count: 1, amount: 3500 },
+          DRIVER_ASSIGNED: { count: 1, amount: 2500 },
+          PICKED_UP: { count: 2, amount: 6000 },
+          DELIVERED: { count: 2, amount: 7500 },
+          REJECTED: { count: 0, amount: 0 }
+        }
+      };
+      return sendSuccess(res, 200, 'Order summary retrieved', summary);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * GET /api/orders/:id
    */
   async getOrderById(req, res, next) {
@@ -77,8 +103,8 @@ async listOrders(req, res, next) {
    */
   async updateOrderStatus(req, res, next) {
     try {
-      const { status } = req.body;
-      const order = await orderService.updateOrderStatus(req.params.id, status);
+      const { status, cancellationReason } = req.body;
+      const order = await orderService.updateOrderStatus(req.params.id, status, cancellationReason);
       
       const io = req.app.get('io');
       if (io) {
@@ -86,6 +112,28 @@ async listOrders(req, res, next) {
         io.to(`order_${order._id}`).emit('order_updated', order);
       }
       
+      // Automatic Driver Allocation when order is marked READY
+      if (status === 'READY') {
+        // Trigger asynchronously so it doesn't block the API response
+        driverAllocationService.allocateDriver(order._id, null)
+          .then(result => {
+            if (io) {
+              const orderWithDriver = result.order.toObject ? result.order.toObject() : { ...result.order };
+              if (result.selectedDriver) {
+                orderWithDriver.driver = result.selectedDriver;
+              }
+              io.emit('driver_assigned', orderWithDriver);
+              io.to(`order_${order._id}`).emit('driver_assigned', orderWithDriver);
+              if (result.selectedDriver) {
+                io.to(`driver_${result.selectedDriver.driverId}`).emit('new_assignment', orderWithDriver);
+              }
+            }
+          })
+          .catch(err => {
+            console.error(`Failed to auto-allocate driver for order ${order._id}:`, err);
+          });
+      }
+
       return sendSuccess(res, 200, 'Order status updated successfully', order);
     } catch (error) {
       next(error);

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   MagnifyingGlass, ShoppingCart, MapPin, User, Bell, 
   CaretDown, Receipt, Heart, CreditCard, AddressBook, Gear, SignOut, Plus, House 
@@ -9,20 +9,45 @@ import { useAuth } from '../context/AuthContext';
 import AuthModal from './AuthModal';
 import './Header.css';
 
-const SAVED_ADDRESSES = [
-  { id: 1, title: 'Home', address: '742 Evergreen Terrace' },
-  { id: 2, title: 'Work', address: '123 Fake Street, Suite 400' }
-];
+const getAddressesFromStorage = () => {
+  try {
+    const saved = localStorage.getItem('demo_addresses');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length > 0) {
+        return parsed.map(a => ({ id: a.id, title: a.label || a.type, address: a.address }));
+      }
+    }
+  } catch(e) {}
+  return [
+    { id: 1, title: 'Home', address: '742 Evergreen Terrace' },
+    { id: 2, title: 'Work', address: '123 Fake Street, Suite 400' }
+  ];
+};
 
 const Header = ({ cartCount }) => {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isAddressOpen, setIsAddressOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(SAVED_ADDRESSES[0]);
+  const [savedAddresses, setSavedAddresses] = useState(getAddressesFromStorage);
+  const [selectedAddress, setSelectedAddress] = useState(savedAddresses[0]);
   
   const addressRef = useRef(null);
   const profileRef = useRef(null);
+
+  // Re-read addresses from localStorage whenever the address dropdown opens
+  useEffect(() => {
+    if (isAddressOpen) {
+      const fresh = getAddressesFromStorage();
+      setSavedAddresses(fresh);
+      // If selected address no longer exists, reset to first
+      if (!fresh.find(a => a.id === selectedAddress?.id)) {
+        setSelectedAddress(fresh[0]);
+      }
+    }
+  }, [isAddressOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -53,7 +78,7 @@ const Header = ({ cartCount }) => {
             <MapPin size={20} weight="fill" color="var(--primary)" className="shrink-0" />
             <div className="location-text-group">
               <span className="location-title">Deliver to <CaretDown size={12} weight="bold" /></span>
-              <span className="location-text">{selectedAddress.address}</span>
+              <span className="location-text">{selectedAddress?.address || 'Select address'}</span>
             </div>
             <span className="delivery-time">⚡ 25-35 mins</span>
           </div>
@@ -61,16 +86,16 @@ const Header = ({ cartCount }) => {
           {isAddressOpen && (
             <div className="header-dropdown-menu address-menu">
               <div className="dropdown-header">Choose Delivery Address</div>
-              {SAVED_ADDRESSES.map(addr => (
+              {savedAddresses.map(addr => (
                 <button 
                   key={addr.id} 
-                  className={cn("header-dropdown-item", selectedAddress.id === addr.id && "active")}
+                  className={cn("header-dropdown-item", selectedAddress?.id === addr.id && "active")}
                   onClick={() => {
                     setSelectedAddress(addr);
                     setIsAddressOpen(false);
                   }}
                 >
-                  <MapPin size={18} weight={selectedAddress.id === addr.id ? "fill" : "regular"} className="item-icon" />
+                  <MapPin size={18} weight={selectedAddress?.id === addr.id ? "fill" : "regular"} className="item-icon" />
                   <div className="address-item-details">
                     <span className="address-title">{addr.title}</span>
                     <span className="address-desc">{addr.address}</span>
@@ -88,8 +113,15 @@ const Header = ({ cartCount }) => {
 
         <div className="search-bar">
           <MagnifyingGlass size={20} color="var(--outline)" className="search-icon shrink-0" />
-          <input type="text" placeholder="Search for artisan sushi, wood-fired pizza..." />
-          <div className="shortcut-badge">⌘K</div>
+          <input 
+            type="text" 
+            placeholder="Search for artisan sushi, wood-fired pizza..." 
+            onChange={(e) => {
+              window.dispatchEvent(new CustomEvent('foodgy-search', { detail: e.target.value }));
+              // Navigate to home if not already there
+              if (window.location.pathname !== '/') navigate('/');
+            }}
+          />
         </div>
         
         <div className="trailing-actions">
@@ -104,7 +136,7 @@ const Header = ({ cartCount }) => {
             <span className="cart-text mobile-only">Alerts</span>
           </button>
           
-          <button className="action-btn cart-btn">
+          <button className="action-btn cart-btn" onClick={() => navigate('/order/checkout')}>
             <ShoppingCart size={24} />
             <span className="cart-text">Cart ({cartCount})</span>
           </button>

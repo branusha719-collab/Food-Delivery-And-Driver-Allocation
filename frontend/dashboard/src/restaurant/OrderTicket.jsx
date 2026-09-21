@@ -35,10 +35,19 @@ export default function OrderTicket({ order, onAct, busy, readOnly }) {
       )}
       {confirming && (
         <div className="reject">
-          <p className="confirm-text">Reject order #{order.ref}? This can't be undone and the customer's order will be cancelled.</p>
+          <p className="confirm-text">{confirming.to === STATUS.REJECTED ? `Cancel order #${order.ref}? This can't be undone.` : `Confirm action for order #${order.ref}?`}</p>
+          {confirming.to === STATUS.REJECTED && (
+            <input 
+              type="text" 
+              placeholder="Reason for cancellation (optional)" 
+              className="reject-reason"
+              onChange={(e) => confirming.reason = e.target.value}
+              style={{ width: '100%', padding: '8px', marginBottom: '12px', border: '1px solid var(--border)', borderRadius: '4px' }}
+            />
+          )}
           <div className="actions two">
-            <button className="btn btn-danger" disabled={busy} onClick={() => onAct(order, confirming.to)}>Yes, reject order</button>
-            <button className="btn btn-ghost" onClick={() => setConfirming(null)}>Keep order</button>
+            <button className="btn btn-danger" disabled={busy} onClick={() => onAct(order, confirming.to, confirming.reason)}>Yes, confirm</button>
+            <button className="btn btn-ghost" onClick={() => setConfirming(null)}>Cancel</button>
           </div>
         </div>
       )}

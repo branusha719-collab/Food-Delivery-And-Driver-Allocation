@@ -19,6 +19,7 @@ const OrderTracker = () => {
   const [assigning, setAssigning] = useState(false);
   const [driver, setDriver] = useState(null);
   const [error, setError] = useState('');
+  const [cancellationReason, setCancellationReason] = useState(null);
 
   // Map backend status strings to status indices
   const statusMap = {
@@ -28,7 +29,8 @@ const OrderTracker = () => {
     'READY': 1,
     'DRIVER_ASSIGNED': 2,
     'PICKED_UP': 3,
-    'DELIVERED': 4
+    'DELIVERED': 4,
+    'REJECTED': -1
   };
 
   useEffect(() => {
@@ -48,8 +50,13 @@ const OrderTracker = () => {
           if (statusMap[status] !== undefined) {
             setStatusIndex(statusMap[status]);
           }
-          if (data.data.driverId) {
-            setDriver(data.data.driverId);
+          if (data.data.cancellationReason) {
+            setCancellationReason(data.data.cancellationReason);
+          }
+          if (data.data.driver) {
+            setDriver(data.data.driver);
+          } else if (data.data.driverId) {
+            setDriver({ name: 'Assigned Driver', vehicleType: 'Unknown', rating: 'N/A', activeOrders: 1 });
           }
         }
       } catch (err) {
@@ -78,8 +85,14 @@ const OrderTracker = () => {
       if (statusMap[updatedOrder.status] !== undefined) {
         setStatusIndex(statusMap[updatedOrder.status]);
       }
-      if (updatedOrder.driverId) {
-        setDriver(updatedOrder.driverId);
+      if (updatedOrder.cancellationReason) {
+        setCancellationReason(updatedOrder.cancellationReason);
+      }
+      if (updatedOrder.driver) {
+        setDriver(updatedOrder.driver);
+      } else if (updatedOrder.driverId) {
+        // Fallback if driver details aren't included but driverId is
+        setDriver({ name: 'Assigned Driver', vehicleType: 'Unknown', rating: 'N/A', activeOrders: 1 });
       }
     });
 
@@ -169,87 +182,78 @@ const OrderTracker = () => {
         <div className="tracker-header">
           <h2>Tracking Order #{id}</h2>
 
-          <span className="eta-badge">
-            {statusIndex >= 4 ? 'Delivered' : '15 mins'}
-          </span>
+          {statusIndex === -1 ? (
+            <span className="eta-badge" style={{ backgroundColor: 'var(--destructive)', color: 'white' }}>
+              Cancelled
+            </span>
+          ) : (
+            <span className="eta-badge">
+              {statusIndex >= 4 ? 'Delivered' : '15 mins'}
+            </span>
+          )}
         </div>
 
-        <div className="map-placeholder">
-          <div className="map-overlay">
-            {statusIndex >= 3 ? (
-              <div className="driver-marker pulse">
-                🚗
-              </div>
-            ) : (
-              <div className="restaurant-marker">
-                🍽️ Preparing your order
+        {statusIndex === -1 ? (
+          <div className="cancelled-state card-level-1" style={{ padding: '2rem', textAlign: 'center', margin: '2rem 0' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
+            <h3 style={{ marginBottom: '1rem', color: 'var(--destructive)' }}>Order Cancelled</h3>
+            <p style={{ color: 'var(--muted)', marginBottom: '1rem' }}>We're sorry, your order could not be fulfilled.</p>
+            {cancellationReason && (
+              <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--destructive)' }}>
+                <strong>Reason:</strong> {cancellationReason}
               </div>
             )}
           </div>
-        </div>
-
-        <div className="timeline-container">
-          {statuses.map((status, index) => {
-            const isActive = index <= statusIndex;
-            const isCurrent = index === statusIndex;
-
-            return (
-              <div
-                key={index}
-                className={`timeline-step ${
-                  isActive ? 'active' : ''
-                } ${isCurrent ? 'current' : ''}`}
-              >
-                <div className="step-icon-wrapper">
-                  {status.icon}
-
-                  {index < statuses.length - 1 && (
-                    <div className="step-line"></div>
-                  )}
-                </div>
-
-                <div className="step-content">
-                  <h4>{status.label}</h4>
-
-                  {isActive && (
-                    <span className="step-time">
-                      {status.time}
-                    </span>
-                  )}
-                </div>
+        ) : (
+          <>
+            <div className="map-placeholder">
+              <div className="map-overlay">
+                {statusIndex >= 3 ? (
+                  <div className="driver-marker pulse">
+                    🚗
+                  </div>
+                ) : (
+                  <div className="restaurant-marker">
+                    🍽️ Preparing your order
+                  </div>
+                )}
               </div>
-            );
-          })}
-        </div>
+            </div>
 
-        {/* Role 5 Driver Allocation */}
-        {!driver && statusIndex < 2 && (
-          <div className="driver-allocation-test card-level-1">
+            <div className="timeline-container">
+              {statuses.map((status, index) => {
+                const isActive = index <= statusIndex;
+                const isCurrent = index === statusIndex;
 
-            <h3>🚚 Driver Allocation</h3>
+                return (
+                  <div
+                    key={index}
+                    className={`timeline-step ${
+                      isActive ? 'active' : ''
+                    } ${isCurrent ? 'current' : ''}`}
+                  >
+                    <div className="step-icon-wrapper">
+                      {status.icon}
 
-            <p>
-              Find the best available driver automatically
-              using distance, workload, rating and vehicle
-              compatibility.
-            </p>
+                      {index < statuses.length - 1 && (
+                        <div className="step-line"></div>
+                      )}
+                    </div>
 
-            <button
-              className="btn-secondary"
-              onClick={handleAssignDriver}
-              disabled={assigning}
-            >
-              {assigning
-                ? 'Finding Best Driver...'
-                : 'Automatically Assign Driver'}
-            </button>
+                    <div className="step-content">
+                      <h4>{status.label}</h4>
 
-            {error && (
-              <p className="driver-allocation-error">
-                {error}
-              </p>
-            )}
-          </div>
+                      {isActive && (
+                        <span className="step-time">
+                          {status.time}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
 
         {/* Selected Driver */}

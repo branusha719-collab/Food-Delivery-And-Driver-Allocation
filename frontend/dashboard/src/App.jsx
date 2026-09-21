@@ -10,12 +10,15 @@ import Drivers from "./admin/Drivers.jsx";
 import AuditLogs from "./admin/AuditLogs.jsx";
 import Reports from "./admin/Reports.jsx";
 
+import DriverDashboard from "./driver/DriverDashboard.jsx";
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/restaurant" element={<ProtectedRoute role="restaurant"><OrdersBoard /></ProtectedRoute>} />
+      <Route path="/driver" element={<ProtectedRoute role="driver"><DriverDashboard /></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
         <Route index element={<Metrics />} />
         <Route path="reports" element={<Reports />} />

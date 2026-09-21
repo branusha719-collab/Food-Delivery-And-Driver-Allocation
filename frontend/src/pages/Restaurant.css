@@ -234,3 +234,46 @@
   padding: 12px 24px;
   border-radius: var(--rounded-full);
 }
+
+/* Swiggy/Zomato-style quantity control on menu items */
+.qty-control-btn {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  background: var(--primary, #f97316);
+  border-radius: var(--rounded-full, 999px);
+  box-shadow: 0 4px 12px rgba(30,34,41, 0.15);
+  overflow: hidden;
+}
+
+.qty-control-btn button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.qty-control-btn button:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.qty-control-btn button:active {
+  background: rgba(255,255,255,0.25);
+}
+
+.qty-control-btn .qty-value {
+  padding: 0 6px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  min-width: 20px;
+  text-align: center;
+}

@@ -88,7 +88,7 @@ const Payments = () => {
           <div className="wallet-balance">
             <CurrencyDollar size={28} weight="bold" />
             <div>
-              <span className="wallet-amount">$24.50</span>
+              <span className="wallet-amount">₹24.50</span>
               <span className="wallet-label">Available Balance</span>
             </div>
           </div>

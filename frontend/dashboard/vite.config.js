@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 5174,
+      strictPort: true,
       // In dev, /api is forwarded to the backend so no CORS setup is needed.
       proxy: { "/api": env.VITE_DEV_PROXY_TARGET || "http://localhost:5000" },
     },

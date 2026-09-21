@@ -81,6 +81,11 @@ const OrderSchema = new mongoose.Schema(
       required: [true, 'Total amount is required'],
       min: [0, 'Total amount cannot be negative']
     }, // in integer paise (subtotal + deliveryFee)
+    cancellationReason: {
+      type: String,
+      default: null,
+      trim: true
+    },
     deliveryAddress: {
       type: String,
       required: [true, 'Delivery address is required'],
