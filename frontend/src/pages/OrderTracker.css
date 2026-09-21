@@ -170,3 +170,89 @@
 .btn-secondary:hover {
   background-color: var(--surface-container);
 }
+.driver-allocation-test {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  background-color: var(--surface-container-low);
+  border-radius: var(--rounded-lg);
+}
+
+.driver-allocation-test h3 {
+  margin-bottom: 8px;
+}
+
+.driver-allocation-test p {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.5;
+}
+
+.driver-allocation-test .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--outline);
+  padding: 8px 16px;
+  border-radius: var(--rounded-full);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.driver-allocation-test .btn-secondary:hover {
+  background-color: var(--surface-container);
+}
+
+.driver-allocation-test .btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.driver-allocation-error {
+  margin-top: var(--spacing-sm);
+  font-size: 13px;
+  color: var(--error);
+}
+
+.driver-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--surface-container-low);
+  border-radius: var(--rounded-lg);
+}
+
+.driver-avatar {
+  background-color: var(--surface-dim);
+  color: var(--on-surface-variant);
+  border-radius: 50%;
+  padding: 8px;
+}
+
+.driver-details {
+  flex: 1;
+}
+
+.driver-details h4 {
+  margin-bottom: 4px;
+}
+
+.driver-details p {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin: 3px 0;
+}
+
+.driver-rating {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.driver-assigned-badge {
+  background-color: var(--primary-container);
+  color: var(--on-primary);
+  padding: 8px 12px;
+  border-radius: var(--rounded-full);
+  font-size: 11px;
+  font-weight: 700;
+}
