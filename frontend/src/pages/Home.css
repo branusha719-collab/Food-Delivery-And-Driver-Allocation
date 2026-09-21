@@ -34,6 +34,8 @@
   font-size: 12px;
   font-weight: 700;
   margin-bottom: var(--spacing-md);
+  white-space: normal;
+  max-width: 100%;
 }
 
 .hero-content h1 {

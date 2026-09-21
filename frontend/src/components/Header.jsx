@@ -74,10 +74,10 @@ const Header = ({ cartCount }) => {
                 </button>
               ))}
               <div className="dropdown-divider"></div>
-              <button className="header-dropdown-item add-new" onClick={() => setIsAddressOpen(false)}>
+              <Link to="/profile/addresses" className="header-dropdown-item add-new" onClick={() => setIsAddressOpen(false)}>
                 <Plus size={18} className="item-icon" />
                 <span className="address-title">Add New Address</span>
-              </button>
+              </Link>
             </div>
           )}
         </div>
@@ -143,7 +143,7 @@ const Header = ({ cartCount }) => {
                 <Link to="/profile/settings" className="header-dropdown-item" onClick={() => setIsProfileOpen(false)}>
                   <Gear size={18} className="item-icon" /> Settings
                 </Link>
-                <button className="header-dropdown-item text-error" onClick={() => setIsProfileOpen(false)}>
+                <button className="header-dropdown-item text-error" onClick={() => { setIsProfileOpen(false); window.location.href = '/'; }}>
                   <SignOut size={18} className="item-icon" /> Log Out
                 </button>
               </div>
