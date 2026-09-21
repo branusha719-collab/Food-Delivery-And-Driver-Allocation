@@ -1,5 +1,5 @@
 const Restaurant = require('../models/Restaurant');
-const ApiResponse = require('../utils/apiResponse');
+const { sendSuccess } = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
 
 class RestaurantController {
@@ -23,10 +23,12 @@ class RestaurantController {
         
       const totalItems = await Restaurant.countDocuments(query);
       
-      res.json(ApiResponse.success(
-        { items, pagination: { page: pageNum, limit: limitNum, totalItems, totalPages: Math.ceil(totalItems / limitNum) } },
-        'Restaurants retrieved successfully'
-      ));
+      return sendSuccess(
+        res,
+        200,
+        'Restaurants retrieved successfully',
+        { items, pagination: { page: pageNum, limit: limitNum, totalItems, totalPages: Math.ceil(totalItems / limitNum) } }
+      );
     } catch (error) {
       next(error);
     }

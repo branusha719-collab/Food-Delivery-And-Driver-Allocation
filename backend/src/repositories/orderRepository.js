@@ -91,7 +91,7 @@ class OrderRepository {
     return await Order.findOneAndUpdate(
       {
         _id: orderId,
-        status: 'READY'
+        status: { $in: ['READY', 'PLACED'] }
       },
       {
         driverId,

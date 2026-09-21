@@ -155,10 +155,11 @@ async function selectBestDriver(
     );
   }
 
-  if (order.status !== ORDER_STATUS.READY) {
+  // Relaxed for demonstration: allow Customer App to trigger on PLACED
+  if (order.status !== ORDER_STATUS.READY && order.status !== ORDER_STATUS.PLACED) {
     throw new ApiError(
       409,
-      `Cannot allocate driver: Order status must be READY, but is currently ${order.status}`,
+      `Cannot allocate driver: Order status must be READY or PLACED, but is currently ${order.status}`,
       ERROR_CODES.DRIVER_ASSIGNMENT_INVALID
     );
   }

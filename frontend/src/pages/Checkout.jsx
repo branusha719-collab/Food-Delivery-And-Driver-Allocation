@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import './Checkout.css';
 
 const Checkout = ({ cart, clearCart }) => {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const cartTotal = cart.reduce((total, item) => total + item.price, 0);
   const taxes = cartTotal * 0.1;
@@ -13,30 +15,59 @@ const Checkout = ({ cart, clearCart }) => {
   const grandTotal = cartTotal + taxes + deliveryFee;
 
   const handlePlaceOrder = async () => {
+    if (!token) {
+      setError("Please sign in to place an order.");
+      return;
+    }
+
+    // Check if cart has items from a real restaurant
+    const restaurantId = cart[0]?._restaurantId;
+    if (!restaurantId || !/^[a-f0-9]{24}$/i.test(restaurantId)) {
+      setError("Cannot place order: Cart contains mock items. Please select items from a real restaurant.");
+      return;
+    }
+
     setLoading(true);
+    setError(null);
     
-    // Simulate real order placement
     try {
-      // Stub for real API
-      /*
-      const response = await axios.post('http://localhost:5000/api/orders', {
-        restaurantId: 1, // Mock
-        items: cart,
-        totalAmount: grandTotal,
-        deliveryAddress: { coordinates: [0, 0] }
+      // Group quantities if there are duplicate items in cart
+      const itemMap = {};
+      cart.forEach(item => {
+        const id = item._mongoId || item.id;
+        if (!itemMap[id]) itemMap[id] = 0;
+        itemMap[id] += 1;
       });
-      const orderId = response.data.data._id;
-      */
+
+      const orderItems = Object.keys(itemMap).map(id => ({
+        menuItemId: id,
+        quantity: itemMap[id]
+      }));
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          restaurantId: restaurantId,
+          deliveryAddress: "742 Evergreen Terrace, Penthouse B, Springfield, 12345",
+          items: orderItems
+        })
+      });
+
+      const data = await response.json();
       
-      // Mock flow
-      setTimeout(() => {
-        const orderId = Math.floor(Math.random() * 1000000);
+      if (data.success) {
         clearCart();
-        navigate(`/order/${orderId}`);
-      }, 1500);
-      
-    } catch (error) {
-      console.error(error);
+        navigate(`/order/${data.data._id}`);
+      } else {
+        throw new Error(data.message || 'Failed to place order');
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'An error occurred while placing your order.');
       setLoading(false);
     }
   };
@@ -73,6 +104,7 @@ const Checkout = ({ cart, clearCart }) => {
 
         <div className="checkout-summary card-level-1">
           <h3>Order Summary</h3>
+          {error && <div style={{ color: 'var(--destructive)', marginBottom: '1rem', padding: '0.5rem', background: 'rgba(239,68,68,0.1)', borderRadius: '6px' }}>{error}</div>}
           <div className="summary-items">
             {cart.map((item, index) => (
               <div key={index} className="summary-item">

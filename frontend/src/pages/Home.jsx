@@ -5,8 +5,16 @@ import { ArrowRightIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { AnimatedShinyText } from "@/registry/magicui/animated-shiny-text";
 import { VideoText } from "@/registry/magicui/video-text";
-import { RESTAURANTS } from '../data/mockData';
+import { RESTAURANTS as MOCK_RESTAURANTS } from '../data/mockData';
 import './Home.css';
+
+const RESTAURANT_IMAGES = [
+  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
+  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80',
+  'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80',
+  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',
+  'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80',
+];
 
 const CATEGORIES = [
   'Gourmet & Fine Dine', 'Artisan Sushi', 'Wood-Fired Pizza', 
@@ -24,6 +32,34 @@ const FILTERS = [
 const Home = () => {
   const [activeCategory, setActiveCategory] = useState('All Cuisines');
   const [activeFilters, setActiveFilters] = useState([]);
+  const [restaurants, setRestaurants] = useState(MOCK_RESTAURANTS);
+
+  useEffect(() => {
+    fetch('/api/restaurants?limit=100&active=true')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data?.items?.length > 0) {
+          // Merge real DB restaurants with visual defaults
+          const dbRestaurants = data.data.items.map((r, i) => ({
+            id: r._id,
+            name: r.name,
+            image: RESTAURANT_IMAGES[i % RESTAURANT_IMAGES.length],
+            rating: (4.3 + Math.random() * 0.7).toFixed(1),
+            reviews: `${Math.floor(200 + Math.random() * 2000)}+`,
+            categories: r.description || 'Multi-Cuisine',
+            deliveryTime: `${15 + Math.floor(Math.random() * 10)}-${28 + Math.floor(Math.random() * 15)} min`,
+            distance: `${(1 + Math.random() * 6).toFixed(1)} km`,
+            featured: `Must try: ${r.name} specials`,
+            badge: i % 3 === 0 ? 'Free Delivery' : null,
+            menu: [] // menu loaded on restaurant page
+          }));
+          setRestaurants(dbRestaurants);
+        }
+      })
+      .catch(() => {
+        // Keep mock data on error
+      });
+  }, []);
 
   const toggleFilter = (filterId) => {
     setActiveFilters(prev => 
@@ -33,27 +69,17 @@ const Home = () => {
     );
   };
 
-  const filteredRestaurants = RESTAURANTS.filter(restaurant => {
-    // Category filter
+  const filteredRestaurants = restaurants.filter(restaurant => {
     if (activeCategory !== 'All Cuisines') {
-      // Very basic mock matching since categories in mockData are strings like "Seafood • Comfort Food"
-      // If we had strict tags, we'd do a better check. For now, just a substring check if possible
-      // Or we just don't heavily filter category for mock if it doesn't match perfectly, 
-      // but let's do a basic includes
-      const catMatch = CATEGORIES.some(c => restaurant.categories.includes(c.split(' ')[0])); 
-      // not perfectly matched with mock data, so we might just skip category strict filtering for this demo
-      // or we just filter by the activeCategory substring
       if (!restaurant.categories.toLowerCase().includes(activeCategory.split(' ')[0].toLowerCase())) {
          return false;
       }
     }
 
-    // Filters
     if (activeFilters.includes('top_rated')) {
       if (parseFloat(restaurant.rating) < 4.5) return false;
     }
     if (activeFilters.includes('fast_delivery')) {
-      // Delivery time looks like "16-31 min". We can check the second number.
       const maxTime = parseInt(restaurant.deliveryTime.split('-')[1]);
       if (maxTime > 30) return false;
     }
