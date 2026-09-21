@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import {
   CheckCircle,
   CookingPot,
@@ -9,6 +10,7 @@ import {
 import './OrderTracker.css';
 
 const API_BASE_URL = '/api';
+const SOCKET_URL = 'http://localhost:5000'; // Match backend port
 
 const OrderTracker = () => {
   const { id } = useParams();
@@ -17,6 +19,74 @@ const OrderTracker = () => {
   const [assigning, setAssigning] = useState(false);
   const [driver, setDriver] = useState(null);
   const [error, setError] = useState('');
+
+  // Map backend status strings to status indices
+  const statusMap = {
+    'PLACED': 0,
+    'RESTAURANT_ACCEPTED': 1,
+    'PREPARING': 1,
+    'READY': 1,
+    'DRIVER_ASSIGNED': 2,
+    'PICKED_UP': 3,
+    'DELIVERED': 4
+  };
+
+  useEffect(() => {
+    // Connect to Socket.IO backend
+    const socket = io(SOCKET_URL);
+
+    // Fetch initial order state
+    const fetchOrder = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/orders/${id}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          const status = data.data.status;
+          if (statusMap[status] !== undefined) {
+            setStatusIndex(statusMap[status]);
+          }
+          if (data.data.driverId) {
+            setDriver(data.data.driverId);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch initial order state", err);
+      }
+    };
+    fetchOrder();
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+      // Join room for this specific order
+      socket.emit('join_order', id);
+    });
+
+    // Listen for order updates
+    socket.on('order_updated', (updatedOrder) => {
+      console.log('Real-time update:', updatedOrder);
+      if (statusMap[updatedOrder.status] !== undefined) {
+        setStatusIndex(statusMap[updatedOrder.status]);
+      }
+    });
+
+    // Listen for driver assignment
+    socket.on('driver_assigned', (updatedOrder) => {
+      console.log('Driver assigned (real-time):', updatedOrder);
+      if (statusMap[updatedOrder.status] !== undefined) {
+        setStatusIndex(statusMap[updatedOrder.status]);
+      }
+      if (updatedOrder.driverId) {
+        setDriver(updatedOrder.driverId);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [id]);
 
   const statuses = [
     {

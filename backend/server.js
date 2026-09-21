@@ -2,11 +2,13 @@ require('dotenv').config();
 const http = require('http');
 const app = require('./src/app');
 const { connectDB, disconnectDB } = require('./src/config/db');
+const { Server } = require('socket.io');
 
 const PORT = process.env.PORT || 5000;
 
 let server;
 let currentPort = parseInt(process.env.PORT || '5000', 10);
+let io;
 
 const startServer = async (portToTry) => {
   try {
@@ -14,6 +16,37 @@ const startServer = async (portToTry) => {
     await connectDB();
 
     server = http.createServer(app);
+
+    // Initialize Socket.IO
+    io = new Server(server, {
+      cors: {
+        origin: "*", // allow all origins for dev/demo
+        methods: ["GET", "POST", "PATCH", "PUT", "DELETE"]
+      }
+    });
+
+    // Make io accessible across all routes
+    app.set('io', io);
+
+    io.on('connection', (socket) => {
+      console.log(`🔌 New client connected: ${socket.id}`);
+      
+      // Clients can join a specific room for their order to receive updates
+      socket.on('join_order', (orderId) => {
+        socket.join(`order_${orderId}`);
+        console.log(`Client ${socket.id} joined room: order_${orderId}`);
+      });
+
+      // Drivers can join a driver-specific room
+      socket.on('join_driver', (driverId) => {
+        socket.join(`driver_${driverId}`);
+        console.log(`Driver ${socket.id} joined room: driver_${driverId}`);
+      });
+
+      socket.on('disconnect', () => {
+        console.log(`🔌 Client disconnected: ${socket.id}`);
+      });
+    });
 
     server.on('error', (err) => {
       if (err.code === 'EADDRINUSE') {

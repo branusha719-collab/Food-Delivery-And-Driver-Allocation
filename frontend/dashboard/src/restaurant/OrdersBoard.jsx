@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useAsync } from "../lib/useAsync.js";
 import { listActiveRestaurantOrders, listRestaurantOrders, updateOrderStatus } from "../api/orders.js";
 import { STATUS, STATUS_LABEL } from "../lib/status.js";
@@ -38,6 +38,36 @@ function Board({ restaurant }) {
   const { data, loading, error, reload, refresh } = useAsync(() => listActiveRestaurantOrders(restaurant.id), [restaurant.id], { interval: 10000 });
   const orders = data ?? [];
   const grouped = useMemo(() => COLUMNS.map((c) => ({ ...c, orders: orders.filter((o) => c.statuses.includes(o.status)) })), [orders]);
+
+  useEffect(() => {
+    // Assuming backend runs on 5000 in dev
+    const socketUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000';
+    import('socket.io-client').then(({ io }) => {
+      const socket = io(socketUrl);
+      
+      socket.on('connect', () => {
+        console.log('OrdersBoard connected to WebSockets');
+      });
+
+      socket.on('order_created', (order) => {
+        if (order.restaurantId === restaurant.id || order.restaurantId?._id === restaurant.id) {
+          console.log('New order received!', order);
+          refresh();
+        }
+      });
+
+      socket.on('order_updated', (order) => {
+        if (order.restaurantId === restaurant.id || order.restaurantId?._id === restaurant.id) {
+          console.log('Order updated:', order);
+          refresh();
+        }
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    });
+  }, [restaurant.id, refresh]);
 
   async function act(order, to) {
     setPending(order.id); setMessage(null);

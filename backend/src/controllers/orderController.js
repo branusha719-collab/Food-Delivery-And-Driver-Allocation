@@ -13,12 +13,18 @@ class OrderController {
     try {
       const { restaurantId, deliveryAddress, items } = req.body;
 
-const order = await orderService.createOrder({
-  customerId: req.user.id,
-  restaurantId,
-  deliveryAddress,
-  items
-});
+      const order = await orderService.createOrder({
+        customerId: req.user.id,
+        restaurantId,
+        deliveryAddress,
+        items
+      });
+      
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('order_created', order);
+      }
+      
       return sendSuccess(res, 201, 'Order created successfully', order);
     } catch (error) {
       next(error);
@@ -73,6 +79,13 @@ async listOrders(req, res, next) {
     try {
       const { status } = req.body;
       const order = await orderService.updateOrderStatus(req.params.id, status);
+      
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('order_updated', order);
+        io.to(`order_${order._id}`).emit('order_updated', order);
+      }
+      
       return sendSuccess(res, 200, 'Order status updated successfully', order);
     } catch (error) {
       next(error);
@@ -97,28 +110,40 @@ async listOrders(req, res, next) {
           requiredVehicleType || null
         );
 
+        const io = req.app.get('io');
+        if (io) {
+          io.emit('driver_assigned', result.order);
+          io.to(`order_${req.params.id}`).emit('driver_assigned', result.order);
+          if (result.selectedDriver) {
+            io.to(`driver_${result.selectedDriver._id}`).emit('new_assignment', result.order);
+          }
+        }
+
+        return sendSuccess(
+          res,
+          200,
+          `Driver automatically allocated: ${result.selectedDriver.name}`,
+          result
+        );
+      }
+
+      // Existing manual assignment behaviour.
+      const order = await orderService.assignDriver(req.params.id, driverId);
+
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('driver_assigned', order);
+        io.to(`order_${order._id}`).emit('driver_assigned', order);
+        io.to(`driver_${driverId}`).emit('new_assignment', order);
+      }
+
       return sendSuccess(
         res,
         200,
-        `Driver automatically allocated: ${result.selectedDriver.name}`,
-        result
+        'Driver assigned successfully',
+        order
       );
-    }
-
-    // Existing manual assignment behaviour.
-    const order =
-      await orderService.assignDriver(
-        req.params.id,
-        driverId
-      );
-
-    return sendSuccess(
-      res,
-      200,
-      'Driver assigned successfully',
-      order
-    );
-  } catch (error) {
+    } catch (error) {
     next(error);
   }
 }
