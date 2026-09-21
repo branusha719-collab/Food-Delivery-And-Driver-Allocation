@@ -111,14 +111,28 @@ class OrderService {
    * @param {string} orderId
    * @returns {Promise<object>}
    */
-  async getOrderById(orderId) {
-    const order = await orderRepository.findById(orderId);
-    if (!order) {
-      throw new ApiError(404, `Order with ID ${orderId} not found`, ERROR_CODES.ORDER_NOT_FOUND);
-    }
-    return order;
+  async getOrderById(orderId, user) {
+  const order = await orderRepository.findById(orderId);
+
+  if (!order) {
+    throw new ApiError(
+      404,
+      `Order with ID ${orderId} not found`,
+      ERROR_CODES.ORDER_NOT_FOUND
+    );
   }
 
+  // Customers can only view their own orders.
+  if (user.role === 'customer' && order.customerId !== user.id) {
+    throw new ApiError(
+      403,
+      'You do not have permission to access this order',
+      ERROR_CODES.FORBIDDEN
+    );
+  }
+
+  return order;
+}
   /**
    * Lists orders with pagination, filtering, and sorting
    * @param {object} query

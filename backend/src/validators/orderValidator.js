@@ -5,10 +5,6 @@ const { ALL_ORDER_STATUSES } = require('../utils/orderStatus');
 const isValidMongoId = (value) => mongoose.Types.ObjectId.isValid(value);
 
 const createOrderValidator = [
-  body('customerId')
-    .trim()
-    .notEmpty()
-    .withMessage('customerId is required'),
   body('restaurantId')
     .trim()
     .notEmpty()
