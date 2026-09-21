@@ -1,0 +1,538 @@
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 1000;
+}
+
+/* 
+  Fix for backdrop-filter breaking position: fixed descendants:
+  We apply the blur to a pseudo-element so that .trailing-actions
+  is not trapped in a new stacking context and can dock to the screen bottom.
+*/
+.site-header.glass-surface {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+}
+
+.site-header.glass-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(30, 34, 41, 0.06);
+  z-index: -1;
+}
+
+.header-container {
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-xl);
+  gap: var(--spacing-lg);
+}
+
+.brand-logo-container {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--primary), var(--secondary-container));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Dropdown Containers */
+.header-dropdown-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.location-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--rounded-full);
+  background-color: var(--surface-container-low);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.location-selector.interactive:hover,
+.user-profile.interactive:hover {
+  background-color: var(--surface-container);
+}
+
+.location-text-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.location-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.location-text {
+  font-weight: 600;
+  color: var(--on-surface);
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delivery-time {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--rounded-full);
+  padding: 0 var(--spacing-md);
+  height: 48px;
+  transition: all 0.2s ease;
+}
+
+.search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0;
+  color: var(--on-surface);
+}
+
+.shortcut-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background-color: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Trailing Actions (Right Side Icons) */
+.trailing-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--rounded-full);
+  height: 48px;
+  padding: 0 12px;
+  color: var(--on-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.action-btn:hover {
+  background-color: var(--surface-container);
+}
+
+.action-btn.icon-btn {
+  width: 48px;
+  padding: 0;
+}
+
+.action-btn.cart-btn {
+  gap: 8px;
+  padding: 0 16px;
+  background-color: var(--primary-container);
+  color: var(--on-primary);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.action-btn.cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -4px rgba(255, 100, 51, 0.4);
+}
+
+/* User Avatar */
+.profile-btn {
+  width: 48px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, var(--primary), var(--secondary-container)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--surface-container-lowest);
+}
+
+.image-avatar {
+  background: transparent;
+  padding: 0;
+}
+.image-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Header Dropdown Menus */
+.header-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--rounded-lg);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  min-width: 260px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  animation: fadeInDown 0.2s ease;
+}
+
+.address-menu {
+  left: 0;
+  min-width: 300px;
+}
+
+.profile-menu {
+  right: 0;
+  min-width: 240px;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header {
+  padding: 8px 16px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.5px;
+}
+
+.header-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--on-surface);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.header-dropdown-item:hover {
+  background-color: var(--surface-container-low);
+}
+
+.header-dropdown-item.active {
+  background-color: var(--surface-container);
+  color: var(--primary);
+}
+
+.item-icon {
+  color: var(--on-surface-variant);
+}
+
+.header-dropdown-item.active .item-icon {
+  color: var(--primary);
+}
+
+.address-item-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.address-title {
+  font-weight: 600;
+}
+
+.address-desc {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--outline-variant);
+  margin: 4px 0;
+  opacity: 0.5;
+}
+
+.add-new {
+  color: var(--primary);
+}
+
+.add-new .item-icon {
+  color: var(--primary);
+}
+
+.text-error {
+  color: #ef4444;
+}
+.text-error .item-icon {
+  color: #ef4444;
+}
+
+/* Profile Header inside Dropdown */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 16px;
+}
+
+.profile-avatar {
+  width: 48px;
+  height: 48px;
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+  border-radius: var(--rounded-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.profile-phone {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+/* Utility Classes */
+.mobile-only {
+  display: none;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 1024px) {
+  .mobile-only {
+    display: flex;
+  }
+  
+  .cart-text.mobile-only {
+    display: block;
+  }
+
+  .site-header {
+    height: auto;
+    padding: var(--spacing-sm) 0;
+  }
+  
+  .header-container {
+    flex-wrap: wrap;
+    padding: 0 var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
+  .location-selector {
+    padding: 6px;
+    background: transparent;
+  }
+  
+  .delivery-time, .location-text {
+    display: none;
+  }
+  
+  .location-title {
+    font-size: 13px;
+    color: var(--on-surface);
+  }
+
+  .search-bar {
+    order: 3;
+    min-width: 100%;
+  }
+
+  .brand-logo {
+    flex: 1;
+  }
+  
+  .cart-text {
+    display: none;
+  }
+
+  /* Mobile Bottom Navigation */
+  .trailing-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: var(--surface-container-lowest);
+    border-top: 1px solid var(--outline-variant);
+    padding: var(--spacing-sm) var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Redesign action buttons for bottom nav */
+  .action-btn {
+    background-color: transparent;
+    border: none;
+    height: auto;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--on-surface-variant);
+    padding: 4px;
+  }
+
+  .action-btn:hover {
+    background-color: transparent;
+    color: var(--primary);
+  }
+
+  .action-btn.cart-btn {
+    background-color: transparent;
+    color: var(--on-surface-variant);
+    box-shadow: none;
+    padding: 4px;
+  }
+  
+  .action-btn.cart-btn:hover {
+    transform: none;
+  }
+
+  .cart-text {
+    display: block; /* Show a small text label under the icon */
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .action-btn.icon-btn {
+    width: auto;
+  }
+
+  .profile-btn {
+    width: auto;
+    height: auto;
+    background: transparent;
+  }
+  
+  .profile-btn::after {
+    display: none; /* Hide gradient ring on mobile nav for simplicity, or we can resize it */
+  }
+
+  .avatar-img {
+    width: 28px;
+    height: 28px;
+    border: none;
+  }
+
+  /* Make profile dropdown open upwards on mobile */
+  .profile-menu {
+    top: auto;
+    bottom: calc(100% + 16px);
+    right: 16px;
+    left: 16px;
+    width: calc(100vw - 32px);
+    transform-origin: bottom center;
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Make address dropdown fullscreen or wider on mobile */
+  .address-menu {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    min-width: unset;
+  }
+}
+ 
+ 

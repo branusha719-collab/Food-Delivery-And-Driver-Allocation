@@ -1,0 +1,175 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+
+@theme {
+  --animate-shimmer: shimmer 8s infinite;
+  
+  @keyframes shimmer {
+    0%, 90%, 100% {
+      background-position: calc(-100% - var(--shimmer-width)) 0;
+    }
+    30%, 60% {
+      background-position: calc(100% + var(--shimmer-width)) 0;
+    }
+  }
+}
+
+:root {
+  --surface: #f9f9ff;
+  --surface-dim: #d7dae3;
+  --surface-bright: #f9f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f1f3fd;
+  --surface-container: #ebeef7;
+  --surface-container-high: #e5e8f2;
+  --surface-container-highest: #dfe2ec;
+  --on-surface: #181c23;
+  --on-surface-variant: #5a413a;
+  --inverse-surface: #2d3138;
+  --inverse-on-surface: #eef0fa;
+  --outline: #8e7068;
+  --outline-variant: #e2bfb5;
+  --surface-tint: #af3000;
+  --primary: #af3000;
+  --on-primary: #ffffff;
+  --primary-container: #ff6433;
+  --on-primary-container: #5c1500;
+  --inverse-primary: #ffb59f;
+  --secondary: #895100;
+  --on-secondary: #ffffff;
+  --secondary-container: #fd9d1a;
+  --on-secondary-container: #663b00;
+  --tertiary: #006a60;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #38a799;
+  --on-tertiary-container: #003630;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+  --primary-fixed: #ffdbd1;
+  --primary-fixed-dim: #ffb59f;
+  --on-primary-fixed: #3a0a00;
+  --on-primary-fixed-variant: #862300;
+  --secondary-fixed: #ffdcbc;
+  --secondary-fixed-dim: #ffb86b;
+  --on-secondary-fixed: #2c1700;
+  --on-secondary-fixed-variant: #683d00;
+  --tertiary-fixed: #8cf5e4;
+  --tertiary-fixed-dim: #6fd8c8;
+  --on-tertiary-fixed: #00201c;
+  --on-tertiary-fixed-variant: #005048;
+  --background: #f9f9ff;
+  --on-background: #181c23;
+  --surface-variant: #dfe2ec;
+}
+
+.dark {
+  --surface: #10141a;
+  --surface-dim: #10141a;
+  --surface-bright: #363941;
+  --surface-container-lowest: #0b0f14;
+  --surface-container-low: #181c23;
+  --surface-container: #1c2027;
+  --surface-container-high: #272a31;
+  --surface-container-highest: #32353c;
+  --on-surface: #e1e2e9;
+  --on-surface-variant: #d5c3be;
+  --inverse-surface: #e1e2e9;
+  --inverse-on-surface: #2d3138;
+  --outline: #9d8e8a;
+  --outline-variant: #504441;
+  --surface-tint: #ffb59f;
+  --primary: #ffb59f;
+  --on-primary: #5c1500;
+  --primary-container: #862300;
+  --on-primary-container: #ffdbd1;
+  --secondary: #ffb86b;
+  --on-secondary: #482900;
+  --secondary-container: #683d00;
+  --on-secondary-container: #ffdcbc;
+  --background: #10141a;
+  --on-background: #e1e2e9;
+  --surface-variant: #504441;
+}
+
+:root {
+
+  --font-display: 'Epilogue', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  
+  --rounded-sm: 0.25rem;
+  --rounded-base: 0.5rem;
+  --rounded-md: 0.75rem;
+  --rounded-lg: 1rem;
+  --rounded-xl: 1.5rem;
+  --rounded-full: 9999px;
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2.5rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--surface);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Glassmorphism Classes */
+.glass-surface {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(30, 34, 41, 0.06);
+}
+
+.card-level-1 {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid rgba(30, 34, 41, 0.05);
+  box-shadow: 0 4px 20px -4px rgba(30, 34, 41, 0.04), 0 2px 6px -2px rgba(255, 100, 51, 0.03);
+  border-radius: var(--rounded-lg);
+}
+
+.btn-primary {
+  background-color: var(--primary-container);
+  color: var(--on-primary);
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: var(--rounded-md);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 16px -4px rgba(255, 100, 51, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
