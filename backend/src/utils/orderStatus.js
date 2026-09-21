@@ -1,0 +1,20 @@
+/**
+ * Central Order Status Enums
+ */
+const ORDER_STATUS = Object.freeze({
+  PLACED: 'PLACED',
+  RESTAURANT_ACCEPTED: 'RESTAURANT_ACCEPTED',
+  PREPARING: 'PREPARING',
+  READY: 'READY',
+  DRIVER_ASSIGNED: 'DRIVER_ASSIGNED',
+  PICKED_UP: 'PICKED_UP',
+  DELIVERED: 'DELIVERED',
+  REJECTED: 'REJECTED'
+});
+
+const ALL_ORDER_STATUSES = Object.freeze(Object.values(ORDER_STATUS));
+
+module.exports = {
+  ORDER_STATUS,
+  ALL_ORDER_STATUSES
+};
